@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Institución Educativa</title>
+</head>
+
+<body>
+    <h1>Bienvenido a la Aplicación de Gestión Escolar</h1>
+    <p>Institución Educativa "El Futuro del Saber"</p>
+
+    <p><strong>Estado de la Base de Datos:</strong> {{ db_status }}</p>
+    {% if db_name != 'N/A' %}
+    <p><strong>Conectado a:</strong> {{ db_name }}</p>
+    {% endif %}
+    <hr>
+
+    <ul>
+        <li><a href="#">Gestionar Estudiantes</a></li>
+        <li><a href="#">Gestionar Docentes</a></li>
+    </ul>
+
+    <footer>
+        <p>&copy; 2025 Institución Educativa "El Futuro del Saber"</p>
+    </footer>
+</body>
+
+</html>
