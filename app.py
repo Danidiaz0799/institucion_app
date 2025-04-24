@@ -87,9 +87,12 @@ def index():
 
     return render_template('index.html', title='Inicio', db_status=db_status, db_name=db_name)
 
-# Importar e registrar el blueprint de estudiantes
+# Importar e registrar los blueprints
 from core.routes.student_routes import students_bp
+from core.routes.teacher_routes import teachers_bp
+
 app.register_blueprint(students_bp, url_prefix='/students')
+app.register_blueprint(teachers_bp, url_prefix='/teachers')
 
 # Actualizar el enlace en index.html
 @app.route('/update_index')
@@ -101,6 +104,10 @@ def update_index():
         # Actualizar el enlace a estudiantes
         updated_content = content.replace('<li><a href="#">Gestionar Estudiantes</a></li>', 
                                          '<li><a href="{{ url_for(\'students.list_students\') }}">Gestionar Estudiantes</a></li>')
+        
+        # Actualizar el enlace a profesores
+        updated_content = updated_content.replace('<a href="#" class="btn btn-secondary">Próximamente</a>', 
+                                              '<a href="{{ url_for(\'teachers.list_teachers\') }}" class="btn btn-primary">Acceder</a>')
         
         with open('core/templates/index.html', 'w') as file:
             file.write(updated_content)

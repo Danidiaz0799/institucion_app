@@ -1,22 +1,5 @@
-import mysql.connector
 from mysql.connector import Error
-
-def get_db_connection(db_config):
-    """Crea y retorna una conexión a la base de datos y un cursor."""
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        return conn, cursor
-    except Error as e:
-        print(f"Error al conectar a MySQL como usuario '{db_config.get('user')}': {e}")
-        return None, None
-
-def close_connection(conn, cursor):
-    """Cierra el cursor y la conexión a la base de datos."""
-    if cursor:
-        cursor.close()
-    if conn and conn.is_connected():
-        conn.close()
+from .connection import get_db_connection, close_connection
 
 def get_all_students(db_config):
     """Obtiene todos los estudiantes de la base de datos."""
@@ -169,20 +152,3 @@ def delete_student(db_config, student_id):
         close_connection(conn, cursor)
     
     return False
-
-def get_all_grades(db_config):
-    """Obtiene todos los grados para usar en formularios."""
-    conn, cursor = get_db_connection(db_config)
-    grades = []
-    
-    try:
-        if conn and cursor:
-            cursor.execute("SELECT grade_id, grade_name FROM grades ORDER BY grade_name")
-            grades = cursor.fetchall()
-    except Error as e:
-        print(f"Error en get_all_grades: {e}")
-        raise e
-    finally:
-        close_connection(conn, cursor)
-    
-    return grades 
