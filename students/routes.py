@@ -12,10 +12,10 @@ def list_students():
     """Lista todos los estudiantes."""
     try:
         students = get_all_students(current_app.config['DB_CONFIG'])
-        return render_template('students/list.html', students=students, title='Lista de Estudiantes')
+        return render_template('list.html', students=students, title='Lista de Estudiantes')
     except Exception as e:
         flash(f"Error al obtener estudiantes: {str(e)}", "error")
-        return render_template('students/list.html', students=[], title='Lista de Estudiantes')
+        return render_template('list.html', students=[], title='Lista de Estudiantes')
 
 @students_bp.route('/<int:student_id>')
 def student_detail(student_id):
@@ -23,7 +23,7 @@ def student_detail(student_id):
     try:
         student = get_student_by_id(current_app.config['DB_CONFIG'], student_id)
         if student:
-            return render_template('students/detail.html', student=student, title='Detalles del Estudiante')
+            return render_template('detail.html', student=student, title='Detalles del Estudiante')
         else:
             flash("Estudiante no encontrado.", "error")
             return redirect(url_for('students.list_students'))
@@ -66,16 +66,16 @@ def new_student():
             else:
                 flash("Error al crear estudiante.", "error")
                 grades = get_all_grades(current_app.config['DB_CONFIG'])
-                return render_template('students/form.html', student=student_data, grades=grades, title='Nuevo Estudiante')
+                return render_template('form.html', student=student_data, grades=grades, title='Nuevo Estudiante')
         
         except Exception as e:
             flash(f"Error al crear estudiante: {str(e)}", "error")
             grades = get_all_grades(current_app.config['DB_CONFIG'])
-            return render_template('students/form.html', student=request.form, grades=grades, title='Nuevo Estudiante')
+            return render_template('form.html', student=request.form, grades=grades, title='Nuevo Estudiante')
     
     else:  # GET request
         grades = get_all_grades(current_app.config['DB_CONFIG'])
-        return render_template('students/form.html', student=None, grades=grades, title='Nuevo Estudiante')
+        return render_template('form.html', student=None, grades=grades, title='Nuevo Estudiante')
 
 @students_bp.route('/<int:student_id>/edit', methods=['GET', 'POST'])
 def edit_student(student_id):
@@ -112,19 +112,19 @@ def edit_student(student_id):
             else:
                 flash("Error al actualizar estudiante.", "error")
                 grades = get_all_grades(current_app.config['DB_CONFIG'])
-                return render_template('students/form.html', student=student_data, student_id=student_id, grades=grades, title='Editar Estudiante')
+                return render_template('form.html', student=student_data, student_id=student_id, grades=grades, title='Editar Estudiante')
         
         except Exception as e:
             flash(f"Error al actualizar estudiante: {str(e)}", "error")
             grades = get_all_grades(current_app.config['DB_CONFIG'])
-            return render_template('students/form.html', student=request.form, student_id=student_id, grades=grades, title='Editar Estudiante')
+            return render_template('form.html', student=request.form, student_id=student_id, grades=grades, title='Editar Estudiante')
     
     else:  # GET request
         try:
             student = get_student_by_id(current_app.config['DB_CONFIG'], student_id)
             if student:
                 grades = get_all_grades(current_app.config['DB_CONFIG'])
-                return render_template('students/form.html', student=student, student_id=student_id, grades=grades, title='Editar Estudiante')
+                return render_template('form.html', student=student, student_id=student_id, grades=grades, title='Editar Estudiante')
             else:
                 flash("Estudiante no encontrado.", "error")
                 return redirect(url_for('students.list_students'))
