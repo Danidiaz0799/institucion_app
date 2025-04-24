@@ -11,43 +11,71 @@
             {% for category, message in messages %}
                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                     {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
 
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
-            <form method="POST" novalidate>
-                <div class="form-group">
-                    <label for="subject_name">Nombre de la Asignatura</label>
-                    <input type="text" class="form-control" id="subject_name" name="subject_name" 
+            <form method="POST" id="subjectForm" novalidate>
+                <div class="mb-3">
+                    <label for="subject_name" class="form-label">Nombre de la Asignatura <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="subject_name" name="subject_name"
                            value="{{ subject.subject_name if subject else '' }}" required>
                 </div>
 
-                <div class="form-group">
-                    <label for="teacher_id">Profesor Asignado</label>
-                    <select class="form-control" id="teacher_id" name="teacher_id">
+                <div class="mb-3">
+                    <label for="teacher_id" class="form-label">Profesor Asignado</label>
+                    <select class="form-select" id="teacher_id" name="teacher_id">
                         <option value="" {% if not subject or not subject.teacher_id %}selected{% endif %}>-- Sin asignar --</option>
                         {% for teacher in teachers %}
-                            <option value="{{ teacher.teacher_id }}" 
+                            <option value="{{ teacher.teacher_id }}"
                                     {% if subject and subject.teacher_id == teacher.teacher_id %}selected{% endif %}>
                                 {{ teacher.first_name }} {{ teacher.last_name }}
                             </option>
                         {% endfor %}
                     </select>
-                    <small class="form-text text-muted">Puedes dejar esto sin asignar por ahora.</small>
+                    <div class="form-text text-muted">Puedes dejar esto sin asignar por ahora.</div>
                 </div>
 
-                <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                <div class="mt-4">
+                    <button type="submit" id="submitBtn" class="btn btn-primary" disabled>Guardar</button>
                     <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-secondary">Cancelar</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('subjectForm');
+    const submitButton = document.getElementById('submitBtn');
+
+    // Select only the required fields
+    const requiredFields = form.querySelectorAll('input[required], select[required]');
+
+    function validateForm() {
+        let allValid = true;
+        requiredFields.forEach(field => {
+            if (!field.value || (field.tagName === 'SELECT' && field.value === "")) {
+                allValid = false;
+            }
+        });
+        submitButton.disabled = !allValid;
+    }
+
+    // Add event listeners to required fields
+    requiredFields.forEach(field => {
+        field.addEventListener('input', validateForm);
+        field.addEventListener('change', validateForm); // For select elements
+    });
+
+    // Initial validation check
+    validateForm();
+});
+</script>
+
 {% endblock %}
