@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Institución El Futuro</title>
+    <!-- Puedes añadir enlaces a CSS aquí si lo deseas -->
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .flash-messages .error {
+            color: red;
+            background-color: #fdd;
+            border: 1px solid red;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .flash-messages .success {
+            color: green;
+            background-color: #dfd;
+            border: 1px solid green;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+
+    <!-- Mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class=flash-messages>
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if students %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                    <th>ID Grado</th>
+                    <!-- Puedes añadir más columnas o acciones aquí (Editar/Eliminar) -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.student_id }}</td>
+                        <td>{{ student.first_name }}</td>
+                        <td>{{ student.last_name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.grade_id }}</td>
+                        <!-- Celdas para acciones futuras -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay estudiantes registrados.</p>
+    {% endif %}
+
+    <p><a href="{{ url_for('index') }}">Volver al inicio</a></p>
+
+</body>
+</html>

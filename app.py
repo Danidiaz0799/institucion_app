@@ -87,6 +87,38 @@ def index():
 
     return render_template('index.html', title='Inicio', db_status=db_status, db_name=db_name)
 
+# Nueva ruta para listar estudiantes
+@app.route('/students')
+def list_students():
+    """Obtiene y muestra la lista de estudiantes."""
+    conn = None
+    cursor = None
+    students = []
+    try:
+        conn, cursor = get_db_connection()
+        if conn and cursor:
+            # CORRECCIÓN: Cambiamos 'id' por 'student_id' (o el nombre correcto de tu PK)
+            # Asegúrate de que 'first_name', 'last_name', 'email', 'grade_id' también sean correctos.
+            cursor.execute("SELECT student_id, first_name, last_name, email, grade_id FROM students ORDER BY last_name")
+            students = cursor.fetchall()
+            print(f"Estudiantes encontrados: {len(students)}") # Línea de depuración
+        else:
+            flash("Error al conectar con la base de datos.", "error")
+            print("Error: No se pudo obtener conexión/cursor para listar estudiantes.") # Línea de depuración
+
+    except Error as e:
+        flash(f"Error al consultar estudiantes: {e}", "error")
+        print(f"Error SQL al listar estudiantes: {e}") # Línea de depuración
+    finally:
+        if cursor:
+            cursor.close()
+        if conn and conn.is_connected():
+            conn.close()
+
+    # Renderizamos la nueva plantilla pasándole la lista de estudiantes
+    # CORRECCIÓN: Asegurarse que la plantilla usa 'student_id' si se cambió aquí.
+    return render_template('students.html', students=students, title='Lista de Estudiantes')
+
 
 # --- Bloque para ejecutar la aplicación (sin cambios) ---
 if __name__ == '__main__':
