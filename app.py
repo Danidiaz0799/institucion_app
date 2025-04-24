@@ -21,8 +21,8 @@ print(f"DB_NAME leído: {os.getenv('DB_NAME')}")
 print("------------------------------------")
 # --- FIN: Bloque de Depuración ---
 
-# Inicializar la aplicación Flask
-app = Flask(__name__)
+# Inicializar la aplicación Flask con la carpeta de templates personalizada
+app = Flask(__name__, template_folder='core/templates')
 
 # Configurar una clave secreta para la sesión de Flask
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key_change_me')
@@ -95,14 +95,14 @@ app.register_blueprint(students_bp, url_prefix='/students')
 @app.route('/update_index')
 def update_index():
     try:
-        with open('templates/index.html', 'r') as file:
+        with open('core/templates/index.html', 'r') as file:
             content = file.read()
         
         # Actualizar el enlace a estudiantes
         updated_content = content.replace('<li><a href="#">Gestionar Estudiantes</a></li>', 
                                          '<li><a href="{{ url_for(\'students.list_students\') }}">Gestionar Estudiantes</a></li>')
         
-        with open('templates/index.html', 'w') as file:
+        with open('core/templates/index.html', 'w') as file:
             file.write(updated_content)
         
         flash("Plantilla de inicio actualizada correctamente.", "success")

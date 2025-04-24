@@ -5,7 +5,7 @@ from core.db_utils import (
     update_student, delete_student, get_all_grades
 )
 
-students_bp = Blueprint('students', __name__, template_folder='templates')
+students_bp = Blueprint('students', __name__, template_folder='../templates')
 
 @students_bp.route('/')
 def list_students():
