@@ -2,16 +2,14 @@ from mysql.connector import Error
 from .connection import get_db_connection, close_connection
 
 def get_all_subjects(db_config):
-    """Obtiene todas las asignaturas con información del profesor."""
     conn, cursor = get_db_connection(db_config)
     subjects = []
     if not conn:
         return subjects
-
     try:
         query = """
-        SELECT s.subject_id, s.subject_name, s.teacher_id, 
-               t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+        SELECT s.subject_id, s.subject_name, s.teacher_id,
+            t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
         FROM subjects s
         LEFT JOIN teachers t ON s.teacher_id = t.teacher_id
         ORDER BY s.subject_name
@@ -25,16 +23,14 @@ def get_all_subjects(db_config):
     return subjects
 
 def get_subject_by_id(db_config, subject_id):
-    """Obtiene una asignatura por su ID."""
     conn, cursor = get_db_connection(db_config)
     subject = None
     if not conn:
         return subject
-
     try:
         query = """
         SELECT s.subject_id, s.subject_name, s.teacher_id,
-               t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+            t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
         FROM subjects s
         LEFT JOIN teachers t ON s.teacher_id = t.teacher_id
         WHERE s.subject_id = %s
@@ -48,15 +44,12 @@ def get_subject_by_id(db_config, subject_id):
     return subject
 
 def create_subject(db_config, subject_name, teacher_id):
-    """Crea una nueva asignatura."""
     conn, cursor = get_db_connection(db_config)
     subject_id = None
     if not conn:
         return subject_id
-
     try:
-        # Asegurarse de que teacher_id sea None si está vacío o es 0, si la FK lo permite
-        teacher_id_to_insert = teacher_id if teacher_id else None 
+        teacher_id_to_insert = teacher_id if teacher_id else None
         cursor.execute(
             "INSERT INTO subjects (subject_name, teacher_id) VALUES (%s, %s)",
             (subject_name, teacher_id_to_insert)
@@ -72,14 +65,11 @@ def create_subject(db_config, subject_name, teacher_id):
     return subject_id
 
 def update_subject(db_config, subject_id, subject_name, teacher_id):
-    """Actualiza una asignatura existente."""
     conn, cursor = get_db_connection(db_config)
     success = False
     if not conn:
         return success
-
     try:
-        # Asegurarse de que teacher_id sea None si está vacío o es 0, si la FK lo permite
         teacher_id_to_update = teacher_id if teacher_id else None
         cursor.execute(
             "UPDATE subjects SET subject_name = %s, teacher_id = %s WHERE subject_id = %s",
@@ -96,20 +86,15 @@ def update_subject(db_config, subject_id, subject_name, teacher_id):
     return success
 
 def delete_subject(db_config, subject_id):
-    """Elimina una asignatura."""
     conn, cursor = get_db_connection(db_config)
     success = False
     if not conn:
         return success
-
     try:
-        # Primero eliminamos las inscripciones de estudiantes a esta asignatura
         try:
             cursor.execute("DELETE FROM student_subjects WHERE subject_id = %s", (subject_id,))
         except Error as e:
             print(f"Error al eliminar inscripciones de estudiantes (puede ser normal si no hay): {e}")
-            
-        # Luego eliminamos la asignatura
         cursor.execute("DELETE FROM subjects WHERE subject_id = %s", (subject_id,))
         conn.commit()
         success = cursor.rowcount > 0
@@ -121,15 +106,13 @@ def delete_subject(db_config, subject_id):
         close_connection(conn, cursor)
     return success
 
-# --- Funciones para gestionar estudiantes en asignaturas --- 
+# --- Funciones para gestionar estudiantes en asignaturas ---
 
 def get_subject_students(db_config, subject_id):
-    """Obtiene todos los estudiantes inscritos en una asignatura."""
     conn, cursor = get_db_connection(db_config)
     students = []
     if not conn:
         return students
-
     try:
         query = """
         SELECT s.student_id, s.first_name, s.last_name, s.email, g.grade_name
@@ -148,7 +131,6 @@ def get_subject_students(db_config, subject_id):
     return students
 
 def get_students_not_in_subject(db_config, subject_id):
-    """Obtiene estudiantes que NO están inscritos en una asignatura específica."""
     conn, cursor = get_db_connection(db_config)
     students = []
     if not conn:
@@ -159,8 +141,8 @@ def get_students_not_in_subject(db_config, subject_id):
         FROM students s
         LEFT JOIN grades g ON s.grade_id = g.grade_id
         WHERE s.student_id NOT IN (
-            SELECT ss.student_id 
-            FROM student_subjects ss 
+            SELECT ss.student_id
+            FROM student_subjects ss
             WHERE ss.subject_id = %s
         )
         ORDER BY s.last_name, s.first_name
@@ -174,14 +156,11 @@ def get_students_not_in_subject(db_config, subject_id):
     return students
 
 def assign_student_to_subject(db_config, student_id, subject_id):
-    """Asigna un estudiante a una asignatura."""
     conn, cursor = get_db_connection(db_config)
     success = False
     if not conn:
         return success
-
     try:
-        # Verificar si ya existe la asignación para evitar duplicados
         cursor.execute(
             "SELECT 1 FROM student_subjects WHERE student_id = %s AND subject_id = %s",
             (student_id, subject_id)
@@ -189,7 +168,6 @@ def assign_student_to_subject(db_config, student_id, subject_id):
         if cursor.fetchone():
             return True # Ya asignado
 
-        # Crear la relación
         cursor.execute(
             "INSERT INTO student_subjects (student_id, subject_id) VALUES (%s, %s)",
             (student_id, subject_id)
@@ -205,12 +183,10 @@ def assign_student_to_subject(db_config, student_id, subject_id):
     return success
 
 def remove_student_from_subject(db_config, student_id, subject_id):
-    """Elimina un estudiante de una asignatura."""
     conn, cursor = get_db_connection(db_config)
     success = False
     if not conn:
         return success
-
     try:
         cursor.execute(
             "DELETE FROM student_subjects WHERE student_id = %s AND subject_id = %s",
@@ -227,16 +203,14 @@ def remove_student_from_subject(db_config, student_id, subject_id):
     return success
 
 def get_student_subjects(db_config, student_id):
-    """Obtiene todas las asignaturas en las que está inscrito un estudiante."""
     conn, cursor = get_db_connection(db_config)
     subjects = []
     if not conn:
         return subjects
-
     try:
         query = """
-        SELECT s.subject_id, s.subject_name, 
-               t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+        SELECT s.subject_id, s.subject_name,
+            t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
         FROM subjects s
         JOIN student_subjects ss ON s.subject_id = ss.subject_id
         LEFT JOIN teachers t ON s.teacher_id = t.teacher_id

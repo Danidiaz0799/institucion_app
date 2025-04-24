@@ -2,16 +2,14 @@ from mysql.connector import Error
 from .connection import get_db_connection, close_connection
 
 def get_all_students(db_config):
-    """Obtiene todos los estudiantes de la base de datos."""
     conn, cursor = get_db_connection(db_config)
     students = []
-    
     try:
         if conn and cursor:
             cursor.execute("""
-                SELECT s.*, g.grade_name 
-                FROM students s 
-                LEFT JOIN grades g ON s.grade_id = g.grade_id 
+                SELECT s.*, g.grade_name
+                FROM students s
+                LEFT JOIN grades g ON s.grade_id = g.grade_id
                 ORDER BY s.last_name
             """)
             students = cursor.fetchall()
@@ -20,20 +18,17 @@ def get_all_students(db_config):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return students
 
 def get_student_by_id(db_config, student_id):
-    """Obtiene un estudiante por su ID."""
     conn, cursor = get_db_connection(db_config)
     student = None
-    
     try:
         if conn and cursor:
             cursor.execute("""
-                SELECT s.*, g.grade_name 
-                FROM students s 
-                LEFT JOIN grades g ON s.grade_id = g.grade_id 
+                SELECT s.*, g.grade_name
+                FROM students s
+                LEFT JOIN grades g ON s.grade_id = g.grade_id
                 WHERE s.student_id = %s
             """, (student_id,))
             student = cursor.fetchone()
@@ -42,20 +37,16 @@ def get_student_by_id(db_config, student_id):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return student
 
 def create_student(db_config, student_data):
-    """Crea un nuevo estudiante en la base de datos."""
     conn, cursor = get_db_connection(db_config)
-    
     try:
         if conn and cursor:
-            # Preparar consulta SQL con los campos específicos
             cursor.execute("""
                 INSERT INTO students (
-                    grade_id, id_type, id_number, first_name, last_name, 
-                    birth_date, residence_city, address, email, 
+                    grade_id, id_type, id_number, first_name, last_name,
+                    birth_date, residence_city, address, email,
                     phone_landline, phone_mobile, guardian_full_name
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
@@ -83,17 +74,14 @@ def create_student(db_config, student_data):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return None
 
 def update_student(db_config, student_id, student_data):
-    """Actualiza un estudiante existente en la base de datos."""
     conn, cursor = get_db_connection(db_config)
-    
     try:
         if conn and cursor:
             cursor.execute("""
-                UPDATE students SET 
+                UPDATE students SET
                     grade_id = %s,
                     id_type = %s,
                     id_number = %s,
@@ -131,13 +119,10 @@ def update_student(db_config, student_id, student_data):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return False
 
 def delete_student(db_config, student_id):
-    """Elimina un estudiante de la base de datos."""
     conn, cursor = get_db_connection(db_config)
-    
     try:
         if conn and cursor:
             cursor.execute("DELETE FROM students WHERE student_id = %s", (student_id,))
@@ -150,5 +135,4 @@ def delete_student(db_config, student_id):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return False

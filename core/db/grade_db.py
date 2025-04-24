@@ -2,15 +2,13 @@ from mysql.connector import Error
 from .connection import get_db_connection, close_connection
 
 def get_all_grades(db_config):
-    """Obtiene todos los grados para usar en formularios."""
     conn, cursor = get_db_connection(db_config)
     grades = []
-    
     try:
         if conn and cursor:
             cursor.execute("""
                 SELECT g.grade_id, g.grade_name, g.director_teacher_id,
-                       t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+                    t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
                 FROM grades g
                 LEFT JOIN teachers t ON g.director_teacher_id = t.teacher_id
                 ORDER BY g.grade_name
@@ -21,19 +19,16 @@ def get_all_grades(db_config):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return grades
 
 def get_grade_by_id(db_config, grade_id):
-    """Obtiene un grado específico por su ID."""
     conn, cursor = get_db_connection(db_config)
     grade = None
-    
     try:
         if conn and cursor:
             cursor.execute("""
                 SELECT g.grade_id, g.grade_name, g.director_teacher_id,
-                       t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+                    t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
                 FROM grades g
                 LEFT JOIN teachers t ON g.director_teacher_id = t.teacher_id
                 WHERE g.grade_id = %s
@@ -44,21 +39,16 @@ def get_grade_by_id(db_config, grade_id):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return grade
 
 def create_grade(db_config, grade_data):
-    """Crea un nuevo grado en la base de datos."""
     conn, cursor = get_db_connection(db_config)
     grade_id = None
-    
     try:
         if conn and cursor:
-            # Si el director_teacher_id viene vacío o es 0, lo manejamos como NULL
             director_teacher_id = grade_data.get('director_teacher_id')
             if not director_teacher_id:
                 director_teacher_id = None
-                
             cursor.execute(
                 "INSERT INTO grades (grade_name, director_teacher_id) VALUES (%s, %s)",
                 (grade_data.get('grade_name'), director_teacher_id)
@@ -72,21 +62,16 @@ def create_grade(db_config, grade_data):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return grade_id
 
 def update_grade(db_config, grade_id, grade_data):
-    """Actualiza un grado existente en la base de datos."""
     conn, cursor = get_db_connection(db_config)
     success = False
-    
     try:
         if conn and cursor:
-            # Si el director_teacher_id viene vacío o es 0, lo manejamos como NULL
             director_teacher_id = grade_data.get('director_teacher_id')
             if not director_teacher_id:
                 director_teacher_id = None
-                
             cursor.execute(
                 "UPDATE grades SET grade_name = %s, director_teacher_id = %s WHERE grade_id = %s",
                 (grade_data.get('grade_name'), director_teacher_id, grade_id)
@@ -100,24 +85,17 @@ def update_grade(db_config, grade_id, grade_data):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return success
 
 def delete_grade(db_config, grade_id):
-    """Elimina un grado de la base de datos si no tiene estudiantes asociados."""
     conn, cursor = get_db_connection(db_config)
     success = False
-    
     try:
         if conn and cursor:
-            # Primero verificamos si hay estudiantes en este grado
             cursor.execute("SELECT COUNT(*) AS count FROM students WHERE grade_id = %s", (grade_id,))
             result = cursor.fetchone()
             if result and result['count'] > 0:
-                # Si hay estudiantes, no permitimos eliminar el grado
                 return False
-            
-            # Si no hay estudiantes, procedemos a eliminar
             cursor.execute("DELETE FROM grades WHERE grade_id = %s", (grade_id,))
             conn.commit()
             success = cursor.rowcount > 0
@@ -128,14 +106,11 @@ def delete_grade(db_config, grade_id):
         raise e
     finally:
         close_connection(conn, cursor)
-    
     return success
 
 def get_grade_students(db_config, grade_id):
-    """Obtiene todos los estudiantes de un grado específico."""
     conn, cursor = get_db_connection(db_config)
     students = []
-    
     try:
         if conn and cursor:
             cursor.execute("""
@@ -150,5 +125,5 @@ def get_grade_students(db_config, grade_id):
         raise e
     finally:
         close_connection(conn, cursor)
-    
+
     return students
