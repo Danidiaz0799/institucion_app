@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 from flask import Flask, render_template, request, redirect, url_for, flash
 from dotenv import load_dotenv
+from datetime import datetime # Import datetime
 
 # Cargar variables de entorno desde el archivo .env, especificando la ruta
 # Guardamos el resultado para ver si encontró el archivo .env
@@ -38,6 +39,11 @@ db_config = {
 # Configuramos una clave en la aplicación para pasar la configuración de la BD a los blueprints
 app.config['DB_CONFIG'] = db_config
 
+# Context Processor para inyectar variables globales a las plantillas
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now} # Make datetime.now available as 'now'
+
 # Función para obtener una conexión a la base de datos (sin cambios)
 def get_db_connection():
     """Crea y retorna una conexión a la base de datos y un cursor."""
@@ -66,7 +72,7 @@ def index():
     current_date = ""
 
     try:
-        from datetime import datetime
+        # No longer need to import datetime here, it's global
         current_date = datetime.now().strftime("%d/%m/%Y")
         
         conn, cursor = get_db_connection()

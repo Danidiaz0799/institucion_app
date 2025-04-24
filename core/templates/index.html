@@ -1,90 +1,121 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="jumbotron bg-light p-5 rounded-lg shadow-sm">
-        <h1 class="display-4">Bienvenido a la Gestión Escolar</h1>
-        <p class="lead">Institución Educativa "El Futuro del Saber"</p>
-        <hr class="my-4">
-        <p>Sistema de administración para estudiantes, docentes y asignaturas.</p>
-        <div class="row mt-4">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Estado del Sistema</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Estado de la Base de Datos:</strong> 
-                            <span class="badge {% if db_status == 'Conectado' %}badge-success{% elif 'Error' in db_status %}badge-danger{% else %}badge-warning{% endif %}">
+<div class="container">
+    
+    <!-- Welcome Header -->
+    <div class="mb-5 text-center text-md-start">
+        <h1 class="display-5 fw-bold">Bienvenido a la Gestión Escolar</h1>
+        <p class="lead text-muted">Institución Educativa "El Futuro del Saber"</p>
+    </div>
+
+    <!-- System Status & Statistics Row -->
+    <div class="row g-4 mb-5">
+        <!-- System Status Card -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-server me-2 text-primary"></i>
+                    <h5 class="mb-0">Estado del Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Estado de la Base de Datos:</span>
+                            <span class="badge bg-{{ 'success' if db_status == 'Conectado' else ('danger' if 'Error' in db_status else 'warning') }} text-white rounded-pill">
                                 {{ db_status }}
                             </span>
-                        </p>
+                        </li>
                         {% if db_name != 'N/A' %}
-                        <p><strong>Base de datos:</strong> {{ db_name }}</p>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                           <span>Base de datos:</span> 
+                           <span class="text-muted">{{ db_name }}</span>
+                        </li>
                         {% endif %}
-                        <p><strong>Fecha actual:</strong> {{ current_date }}</p>
-                    </div>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Fecha actual:</span> 
+                            <span class="text-muted">{{ current_date }}</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Estadísticas</h5>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Total de Estudiantes:</strong> <span class="badge badge-info">{{ student_count }}</span></p>
-                        <p><strong>Total de Docentes:</strong> <span class="badge badge-info">{{ teacher_count }}</span></p>
-                        <p><strong>Total de Asignaturas:</strong> <span class="badge badge-info">{{ subject_count }}</span></p>
-                        <p><strong>Total de Grados:</strong> <span class="badge badge-info">{{ grade_count }}</span></p>
-                    </div>
+        </div>
+        
+        <!-- Statistics Card -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                 <div class="card-header d-flex align-items-center">
+                    <i class="fas fa-chart-pie me-2 text-primary"></i>
+                    <h5 class="mb-0">Estadísticas</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de Estudiantes:
+                            <span class="badge bg-info text-white rounded-pill">{{ student_count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de Docentes:
+                             <span class="badge bg-info text-white rounded-pill">{{ teacher_count }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de Asignaturas:
+                            <span class="badge bg-info text-white rounded-pill">{{ subject_count }}</span>
+                        </li>
+                         <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Total de Grados:
+                           <span class="badge bg-info text-white rounded-pill">{{ grade_count }}</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <h2 class="mb-4">Accesos Rápidos</h2>
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="mb-0 h5">Estudiantes</h4>
-                </div>
-                <div class="card-body">
-                    <p>Gestión de estudiantes, inscripciones y detalles.</p>
-                    <a href="{{ url_for('students.list_students') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="mb-0 h5">Docentes</h4>
-                </div>
-                <div class="card-body">
-                    <p>Gestión de docentes, asignaturas y datos.</p>
-                    <a href="{{ url_for('teachers.list_teachers') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
+    <!-- Quick Access Section -->
+    <h2 class="mb-4 text-center text-md-start">Accesos Rápidos</h2>
+    <div class="row g-4">
+        <!-- Students Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center shadow-sm h-100 quick-access-card">
+                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title h5">Estudiantes</h4>
+                    <p class="card-text small text-muted flex-grow-1">Gestión de estudiantes, inscripciones y detalles.</p>
+                    <a href="{{ url_for('students.list_students') }}" class="btn btn-primary mt-3 w-100"><i class="fas fa-arrow-right me-1"></i>Acceder</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="mb-0 h5">Asignaturas</h4>
-                </div>
-                <div class="card-body">
-                    <p>Gestión de asignaturas, profesores y estudiantes.</p>
-                    <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
+        <!-- Teachers Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center shadow-sm h-100 quick-access-card">
+                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title h5">Docentes</h4>
+                    <p class="card-text small text-muted flex-grow-1">Gestión de docentes, asignaturas y datos.</p>
+                    <a href="{{ url_for('teachers.list_teachers') }}" class="btn btn-primary mt-3 w-100"><i class="fas fa-arrow-right me-1"></i>Acceder</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 class="mb-0 h5">Grados</h4>
+        <!-- Subjects Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center shadow-sm h-100 quick-access-card">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title h5">Asignaturas</h4>
+                    <p class="card-text small text-muted flex-grow-1">Gestión de asignaturas, profesores y estudiantes.</p>
+                    <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-primary mt-3 w-100"><i class="fas fa-arrow-right me-1"></i>Acceder</a>
                 </div>
-                <div class="card-body">
-                    <p>Gestión de grados, directores y estudiantes.</p>
-                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
+            </div>
+        </div>
+        <!-- Grades Card -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card text-center shadow-sm h-100 quick-access-card">
+                 <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-layer-group fa-3x text-primary mb-3"></i>
+                    <h4 class="card-title h5">Grados</h4>
+                    <p class="card-text small text-muted flex-grow-1">Gestión de grados, directores y estudiantes.</p>
+                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-primary mt-3 w-100"><i class="fas fa-arrow-right me-1"></i>Acceder</a>
                 </div>
             </div>
         </div>

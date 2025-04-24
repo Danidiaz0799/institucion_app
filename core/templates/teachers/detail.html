@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>{{ title }}</h1>
         {% if teacher %}
@@ -42,6 +42,10 @@
                                 <strong>Apellidos:</strong>
                                 <span>{{ teacher.last_name }}</span>
                             </li>
+                             <li class="list-group-item d-flex justify-content-between">
+                                <strong>Fecha de Nacimiento:</strong>
+                                <span>{{ teacher.birth_date.strftime('%d/%m/%Y') if teacher.birth_date else 'N/A' }}</span>
+                            </li>
                         </ul>
                     </div>
                     <div class="col-md-6">
@@ -63,14 +67,6 @@
                                 <strong>Nivel Educativo:</strong>
                                 <span>{{ teacher.education_level if teacher.education_level else 'N/A' }}</span>
                             </li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <strong>Profesión:</strong>
-                                <span>{{ teacher.profession if teacher.profession else 'N/A' }}</span>
-                            </li>
-                             <li class="list-group-item d-flex justify-content-between">
-                                <strong>Años de Experiencia:</strong>
-                                <span>{{ teacher.experience_years if teacher.experience_years is not none else 'N/A' }}</span>
-                            </li>
                         </ul>
                     </div>
                 </div>
@@ -78,27 +74,25 @@
         </div>
 
         <!-- Sección de Asignaturas Asignadas -->
-        <div class="card mt-4">
+        <div class="card mt-4 mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Asignaturas Asignadas</h5>
             </div>
             <div class="card-body p-0">
-                {% if assigned_subjects %}
+                {% if subjects %}
                     <div class="table-responsive shadow-sm">
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
                                     <th scope="col">Nombre de la Asignatura</th>
-                                    <th scope="col">Grado</th>
-                                    <th scope="col">Descripción</th>
+                                    <th scope="col">ID</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for subject in assigned_subjects %}
+                                {% for subject in subjects %}
                                     <tr>
                                         <td data-label="Asignatura">{{ subject.subject_name }}</td>
-                                        <td data-label="Grado">{{ subject.grade_name }}</td>
-                                        <td data-label="Descripción">{{ subject.description if subject.description else '-' }}</td>
+                                        <td data-label="ID">{{ subject.subject_id }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -112,6 +106,39 @@
             </div>
         </div>
 
+        <!-- Sección de Grados Dirigidos -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Grados Dirigidos</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if grades %}
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nombre del Grado</th>
+                                    <th scope="col">ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
+                                    <tr>
+                                        <td data-label="Grado">{{ grade.grade_name }}</td>
+                                        <td data-label="ID">{{ grade.grade_id }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-3">
+                        <p class="text-muted mb-0">Este docente no es director de ningún grado.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Modal de confirmación para eliminar -->
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -120,7 +147,7 @@
                         <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
-                        </button>
+                        </button
                     </div>
                     <div class="modal-body">
                         ¿Está seguro que desea eliminar al docente <strong>{{ teacher.first_name }} {{ teacher.last_name }}</strong>?

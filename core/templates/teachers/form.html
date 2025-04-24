@@ -1,90 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <h1>{{ title }}</h1>
 
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
             <form method="POST" novalidate>
                 <div class="row">
                     <!-- Información Personal -->
                     <div class="col-md-6">
                         <h5 class="mb-3">Información Personal</h5>
-                        
                         <div class="form-group">
                             <label for="id_type">Tipo de Documento</label>
                             <select class="form-control" id="id_type" name="id_type" required>
                                 <option value="" disabled {% if not teacher or not teacher.id_type %}selected{% endif %}>Seleccione un tipo</option>
                                 <option value="CC" {% if teacher and teacher.id_type == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                                <option value="TI" {% if teacher and teacher.id_type == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
                                 <option value="CE" {% if teacher and teacher.id_type == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
-                                <option value="PP" {% if teacher and teacher.id_type == 'PP' %}selected{% endif %}>Pasaporte</option>
                             </select>
                         </div>
-                        
                         <div class="form-group">
                             <label for="id_number">Número de Documento</label>
                             <input type="text" class="form-control" id="id_number" name="id_number" value="{{ teacher.id_number if teacher else '' }}" required>
                         </div>
-                        
                         <div class="form-group">
                             <label for="first_name">Nombres</label>
                             <input type="text" class="form-control" id="first_name" name="first_name" value="{{ teacher.first_name if teacher else '' }}" required>
                         </div>
-                        
                         <div class="form-group">
                             <label for="last_name">Apellidos</label>
                             <input type="text" class="form-control" id="last_name" name="last_name" value="{{ teacher.last_name if teacher else '' }}" required>
                         </div>
-                        
-                        <div class="form-group">
+                         <div class="form-group">
                             <label for="birth_date">Fecha de Nacimiento</label>
                             <input type="date" class="form-control" id="birth_date" name="birth_date" 
-                                value="{% if teacher and teacher.birth_date %}
-                                        {% if teacher.birth_date is string %}
-                                            {{ teacher.birth_date }}
-                                        {% else %}
-                                            {{ teacher.birth_date.strftime('%Y-%m-%d') }}
-                                        {% endif %}
-                                      {% else %}
-                                        {{ '' }}
-                                      {% endif %}">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="education_level">Nivel Educativo</label>
-                            <select class="form-control" id="education_level" name="education_level" required>
-                                <option value="" disabled {% if not teacher or not teacher.education_level %}selected{% endif %}>Seleccione un nivel</option>
-                                <option value="Pregrado" {% if teacher and teacher.education_level == 'Pregrado' %}selected{% endif %}>Pregrado</option>
-                                <option value="Especialización" {% if teacher and teacher.education_level == 'Especialización' %}selected{% endif %}>Especialización</option>
-                                <option value="Maestría" {% if teacher and teacher.education_level == 'Maestría' %}selected{% endif %}>Maestría</option>
-                                <option value="Doctorado" {% if teacher and teacher.education_level == 'Doctorado' %}selected{% endif %}>Doctorado</option>
-                            </select>
+                                   value="{{ teacher.birth_date.strftime('%Y-%m-%d') if teacher and teacher.birth_date else '' }}">
                         </div>
                     </div>
                     
-                    <!-- Información de Contacto -->
+                    <!-- Información de Contacto y Profesional -->
                     <div class="col-md-6">
-                        <h5 class="mb-3">Información de Contacto</h5>
-                        
+                        <h5 class="mb-3">Información de Contacto y Educativa</h5>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" value="{{ teacher.email if teacher else '' }}" required>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ teacher.email if teacher else '' }}">
                         </div>
-                        
                         <div class="form-group">
                             <label for="phone_landline">Teléfono Fijo</label>
                             <input type="text" class="form-control" id="phone_landline" name="phone_landline" value="{{ teacher.phone_landline if teacher else '' }}">
                         </div>
-                        
                         <div class="form-group">
                             <label for="phone_mobile">Celular</label>
-                            <input type="text" class="form-control" id="phone_mobile" name="phone_mobile" value="{{ teacher.phone_mobile if teacher else '' }}" required>
+                            <input type="text" class="form-control" id="phone_mobile" name="phone_mobile" value="{{ teacher.phone_mobile if teacher else '' }}">
+                        </div>
+                         <div class="form-group">
+                            <label for="education_level">Nivel Educativo</label>
+                            <input type="text" class="form-control" id="education_level" name="education_level" value="{{ teacher.education_level if teacher else '' }}">
                         </div>
                     </div>
                 </div>
                 
-                <div class="form-group mt-4">
+                <hr class="my-4">
+                
+                <div class="form-group mt-3">
                     <button type="submit" class="btn btn-primary">Guardar</button>
                     {% if teacher_id %}
                         <a href="{{ url_for('teachers.teacher_detail', teacher_id=teacher_id) }}" class="btn btn-secondary">Cancelar</a>
