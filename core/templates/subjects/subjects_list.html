@@ -30,9 +30,7 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Nombre Asignatura</th>
-                        <th scope="col">Descripción</th>
                         <th scope="col">Profesor Asignado</th>
-                        <th scope="col">Grado</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -41,9 +39,14 @@
                         <tr>
                             <td data-label="ID">{{ subject.subject_id }}</td>
                             <td data-label="Nombre">{{ subject.subject_name }}</td>
-                            <td data-label="Descripción">{{ subject.description if subject.description else '-' }}</td>
-                            <td data-label="Profesor">{{ subject.teacher_name if subject.teacher_name else 'Sin asignar' }}</td>
-                            <td data-label="Grado">{{ subject.grade_name if subject.grade_name else 'N/A' }}</td>
+                            <td data-label="Profesor">
+                                {# Combine first and last name if available #}
+                                {% if subject.teacher_first_name %}
+                                    {{ subject.teacher_first_name }} {{ subject.teacher_last_name }}
+                                {% else %}
+                                    <em class="text-muted">Sin asignar</em>
+                                {% endif %}
+                            </td>
                             <td data-label="Acciones">
                                 <div class="btn-group btn-group-sm" role="group">
                                     <a href="{{ url_for('subjects.edit_subject', subject_id=subject.subject_id) }}" class="btn btn-warning">Editar</a>
