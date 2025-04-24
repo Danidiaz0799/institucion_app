@@ -88,7 +88,7 @@ def index():
     return render_template('index.html', title='Inicio', db_status=db_status, db_name=db_name)
 
 # Importar e registrar el blueprint de estudiantes
-from students.routes import students_bp
+from core.routes.student_routes import students_bp
 app.register_blueprint(students_bp, url_prefix='/students')
 
 # Actualizar el enlace en index.html
