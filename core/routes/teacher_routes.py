@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from datetime import datetime
-from core.db_utils import (
+# Cambiar las importaciones para usar los nuevos módulos
+from core.db.teacher_db import (
     get_all_teachers, get_teacher_by_id, create_teacher, 
     update_teacher, delete_teacher, get_teacher_subjects, get_teacher_grades
 )
@@ -151,4 +152,4 @@ def delete_teacher_route(teacher_id):
     
     except Exception as e:
         flash(f"Error al eliminar docente: {str(e)}", "error")
-        return redirect(url_for('teachers.list_teachers')) 
+        return redirect(url_for('teachers.list_teachers'))

@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from datetime import datetime
-from core.db_utils import (
+# Cambiar las importaciones para usar los nuevos módulos
+from core.db.student_db import (
     get_all_students, get_student_by_id, create_student, 
-    update_student, delete_student, get_all_grades
+    update_student, delete_student
 )
+from core.db.grade_db import get_all_grades
 
 students_bp = Blueprint('students', __name__, template_folder='../templates')
 
@@ -155,4 +157,4 @@ def delete_student_route(student_id):
     
     except Exception as e:
         flash(f"Error al eliminar estudiante: {str(e)}", "error")
-        return redirect(url_for('students.list_students')) 
+        return redirect(url_for('students.list_students'))
