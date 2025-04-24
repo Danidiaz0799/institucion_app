@@ -29,14 +29,14 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret_key_change_me')
 
 # Configuración de la conexión a la base de datos
 db_config = {
-    'host': os.getenv('DB_HOST'),
-    'user': os.getenv('DB_USER'), # Usa el valor leído por os.getenv
-    'password': os.getenv('DB_PASSWORD'),
-    'database': os.getenv('DB_NAME')
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', ''),
+    'database': os.getenv('DB_NAME', 'institucion_el_futuro')
 }
 
-# --- El resto del archivo (get_db_connection, rutas, if __name__...) sigue igual ---
-# ... (resto del código como estaba) ...
+# Configuramos una clave en la aplicación para pasar la configuración de la BD a los blueprints
+app.config['DB_CONFIG'] = db_config
 
 # Función para obtener una conexión a la base de datos (sin cambios)
 def get_db_connection():
@@ -87,38 +87,29 @@ def index():
 
     return render_template('index.html', title='Inicio', db_status=db_status, db_name=db_name)
 
-# Nueva ruta para listar estudiantes
-@app.route('/students')
-def list_students():
-    """Obtiene y muestra la lista de estudiantes."""
-    conn = None
-    cursor = None
-    students = []
+# Importar e registrar el blueprint de estudiantes
+from students.routes import students_bp
+app.register_blueprint(students_bp, url_prefix='/students')
+
+# Actualizar el enlace en index.html
+@app.route('/update_index')
+def update_index():
     try:
-        conn, cursor = get_db_connection()
-        if conn and cursor:
-            # CORRECCIÓN: Cambiamos 'id' por 'student_id' (o el nombre correcto de tu PK)
-            # Asegúrate de que 'first_name', 'last_name', 'email', 'grade_id' también sean correctos.
-            cursor.execute("SELECT student_id, first_name, last_name, email, grade_id FROM students ORDER BY last_name")
-            students = cursor.fetchall()
-            print(f"Estudiantes encontrados: {len(students)}") # Línea de depuración
-        else:
-            flash("Error al conectar con la base de datos.", "error")
-            print("Error: No se pudo obtener conexión/cursor para listar estudiantes.") # Línea de depuración
-
-    except Error as e:
-        flash(f"Error al consultar estudiantes: {e}", "error")
-        print(f"Error SQL al listar estudiantes: {e}") # Línea de depuración
-    finally:
-        if cursor:
-            cursor.close()
-        if conn and conn.is_connected():
-            conn.close()
-
-    # Renderizamos la nueva plantilla pasándole la lista de estudiantes
-    # CORRECCIÓN: Asegurarse que la plantilla usa 'student_id' si se cambió aquí.
-    return render_template('students.html', students=students, title='Lista de Estudiantes')
-
+        with open('templates/index.html', 'r') as file:
+            content = file.read()
+        
+        # Actualizar el enlace a estudiantes
+        updated_content = content.replace('<li><a href="#">Gestionar Estudiantes</a></li>', 
+                                         '<li><a href="{{ url_for(\'students.list_students\') }}">Gestionar Estudiantes</a></li>')
+        
+        with open('templates/index.html', 'w') as file:
+            file.write(updated_content)
+        
+        flash("Plantilla de inicio actualizada correctamente.", "success")
+    except Exception as e:
+        flash(f"Error al actualizar la plantilla de inicio: {e}", "error")
+    
+    return redirect(url_for('index'))
 
 # --- Bloque para ejecutar la aplicación (sin cambios) ---
 if __name__ == '__main__':
