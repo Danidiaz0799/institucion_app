@@ -112,15 +112,48 @@ def delete_subject_post(subject_id):
 
 # --- Rutas para gestionar estudiantes en asignaturas --- 
 
-@subjects_bp.route('/<int:subject_id>/manage', methods=['GET'])
+@subjects_bp.route('/<int:subject_id>/manage', methods=['GET', 'POST'])
 def manage_subject_students(subject_id):
-    """Muestra la interfaz para gestionar estudiantes de una asignatura."""
+    """Muestra la interfaz y maneja la gestión de estudiantes de una asignatura."""
     try:
         subject = get_subject_by_id(current_app.config['DB_CONFIG'], subject_id)
         if not subject:
             flash("Asignatura no encontrada", "error")
             return redirect(url_for('subjects.list_subjects'))
-        
+
+        if request.method == 'POST':
+            # Handle adding a student
+            if 'add_student' in request.form:
+                student_id_to_add = request.form.get('add_student')
+                if student_id_to_add:
+                    try:
+                        success = assign_student_to_subject(current_app.config['DB_CONFIG'], student_id_to_add, subject_id)
+                        if success:
+                            flash("Estudiante inscrito exitosamente", "success")
+                        else:
+                            flash("Error al inscribir estudiante", "error")
+                    except Exception as e:
+                        flash(f"Error al inscribir: {str(e)}", "error")
+                else:
+                     flash("No se seleccionó ningún estudiante para añadir.", "warning")
+            
+            # Handle removing a student
+            elif 'remove_student' in request.form:
+                student_id_to_remove = request.form.get('remove_student')
+                if student_id_to_remove:
+                    try:
+                        success = remove_student_from_subject(current_app.config['DB_CONFIG'], student_id_to_remove, subject_id)
+                        if success:
+                            flash("Inscripción de estudiante eliminada exitosamente", "success")
+                        else:
+                            flash("Error al eliminar inscripción", "error")
+                    except Exception as e:
+                        flash(f"Error al eliminar inscripción: {str(e)}", "error")
+            
+            # Redirect back to the same page after POST to prevent re-submission
+            return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
+
+        # --- GET Request Logic --- 
         enrolled_students = get_subject_students(current_app.config['DB_CONFIG'], subject_id)
         available_students = get_students_not_in_subject(current_app.config['DB_CONFIG'], subject_id)
         
@@ -129,43 +162,7 @@ def manage_subject_students(subject_id):
                               enrolled_students=enrolled_students,
                               available_students=available_students,
                               title=f"Gestionar Estudiantes - {subject['subject_name']}")
+
     except Exception as e:
         flash(f"Error al obtener datos para gestionar estudiantes: {str(e)}", "error")
         return redirect(url_for('subjects.list_subjects'))
-
-@subjects_bp.route('/<int:subject_id>/add_student', methods=['POST'])
-def add_student(subject_id):
-    """Añade un estudiante a una asignatura."""
-    try:
-        student_id = request.form.get('student_id')
-        if not student_id:
-            flash("Estudiante no seleccionado", "error")
-            return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
-        
-        success = assign_student_to_subject(current_app.config['DB_CONFIG'], student_id, subject_id)
-        
-        if success:
-            flash("Estudiante inscrito en la asignatura exitosamente", "success")
-        else:
-            flash("Error al inscribir estudiante en la asignatura", "error")
-        
-        return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
-    except Exception as e:
-        flash(f"Error al inscribir estudiante: {str(e)}", "error")
-        return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
-
-@subjects_bp.route('/<int:subject_id>/remove_student/<int:student_id>', methods=['POST'])
-def remove_student(subject_id, student_id):
-    """Elimina un estudiante de una asignatura."""
-    try:
-        success = remove_student_from_subject(current_app.config['DB_CONFIG'], student_id, subject_id)
-        
-        if success:
-            flash("Inscripción de estudiante eliminada exitosamente", "success")
-        else:
-            flash("Error al eliminar inscripción", "error")
-        
-        return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
-    except Exception as e:
-        flash(f"Error al eliminar inscripción: {str(e)}", "error")
-        return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
