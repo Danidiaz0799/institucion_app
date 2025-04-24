@@ -12,7 +12,7 @@
                 <div class="mb-3">
                     <label for="grade_name" class="form-label">Nombre del Grado <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="grade_name" name="grade_name"
-                           value="{{ grade.grade_name if grade else '' }}" required>
+                        value="{{ grade.grade_name if grade else '' }}" required>
                     <div class="form-text text-muted">Ejemplo: "Primero A", "Segundo B", "Tercero C"</div>
                 </div>
 
@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('gradeForm');
     const submitButton = document.getElementById('submitBtn');
 
-    // Select only the required fields
     const requiredFields = form.querySelectorAll('input[required], select[required]');
 
     function validateForm() {
@@ -57,13 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.disabled = !allValid;
     }
 
-    // Add event listeners to required fields
     requiredFields.forEach(field => {
         field.addEventListener('input', validateForm);
-        field.addEventListener('change', validateForm); // For select elements
+        field.addEventListener('change', validateForm);
     });
 
-    // Initial validation check
     validateForm();
 });
 </script>

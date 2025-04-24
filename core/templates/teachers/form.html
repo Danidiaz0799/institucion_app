@@ -32,13 +32,13 @@
                             <label for="last_name" class="form-label">Apellidos <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="last_name" name="last_name" value="{{ teacher.last_name if teacher else '' }}" required>
                         </div>
-                         <div class="mb-3">
+                        <div class="mb-3">
                             <label for="birth_date" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" class="form-control" id="birth_date" name="birth_date" 
-                                   value="{{ teacher.birth_date.strftime('%Y-%m-%d') if teacher and teacher.birth_date else '' }}">
+                            <input type="date" class="form-control" id="birth_date" name="birth_date"
+                                value="{{ teacher.birth_date.strftime('%Y-%m-%d') if teacher and teacher.birth_date else '' }}">
                         </div>
                     </div>
-                    
+
                     <!-- Información de Contacto y Profesional -->
                     <div class="col-md-6">
                         <h5 class="mb-3">Información de Contacto y Educativa</h5>
@@ -54,15 +54,15 @@
                             <label for="phone_mobile" class="form-label">Celular</label>
                             <input type="text" class="form-control" id="phone_mobile" name="phone_mobile" value="{{ teacher.phone_mobile if teacher else '' }}">
                         </div>
-                         <div class="mb-3">
+                        <div class="mb-3">
                             <label for="education_level" class="form-label">Nivel Educativo</label>
                             <input type="text" class="form-control" id="education_level" name="education_level" value="{{ teacher.education_level if teacher else '' }}">
                         </div>
                     </div>
                 </div>
-                
+
                 <hr class="my-4">
-                
+
                 <div class="mt-3">
                     <button type="submit" id="submitBtn" class="btn btn-primary" disabled>Guardar</button>
                     {% if teacher_id %}
@@ -81,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('teacherForm');
     const submitButton = document.getElementById('submitBtn');
 
-    // Select only the required fields
     const requiredFields = form.querySelectorAll('input[required], select[required]');
 
     function validateForm() {
@@ -94,15 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.disabled = !allValid;
     }
 
-    // Add event listeners to required fields
     requiredFields.forEach(field => {
         field.addEventListener('input', validateForm);
-        field.addEventListener('change', validateForm); // For select elements
+        field.addEventListener('change', validateForm);
     });
 
-    // Initial validation check
     validateForm();
 });
 </script>
 
-{% endblock %} 
+{% endblock %}

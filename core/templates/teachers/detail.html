@@ -42,7 +42,7 @@
                                 <strong>Apellidos:</strong>
                                 <span>{{ teacher.last_name }}</span>
                             </li>
-                             <li class="list-group-item d-flex justify-content-between">
+                            <li class="list-group-item d-flex justify-content-between">
                                 <strong>Fecha de Nacimiento:</strong>
                                 <span>{{ teacher.birth_date.strftime('%d/%m/%Y') if teacher.birth_date else 'N/A' }}</span>
                             </li>
@@ -170,4 +170,4 @@
         <a href="{{ url_for('teachers.list_teachers') }}" class="btn btn-secondary">Volver a la lista</a>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

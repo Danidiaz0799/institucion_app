@@ -20,7 +20,7 @@
                 <h5 class="mb-0">Información del Grado</h5>
             </div>
             <div class="card-body">
-                 <ul class="list-group list-group-flush mb-3">
+                <ul class="list-group list-group-flush mb-3">
                     <li class="list-group-item d-flex justify-content-between">
                         <strong>ID:</strong>
                         <span>{{ grade.grade_id }}</span>
@@ -81,10 +81,10 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <!-- Modal de confirmación para eliminar -->
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-             <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
@@ -103,7 +103,7 @@
                 </div>
             </div>
         </div>
-        
+
     {% else %}
         <div class="alert alert-danger">
             Grado no encontrado.

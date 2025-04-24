@@ -11,7 +11,7 @@
                     <!-- Información Personal -->
                     <div class="col-md-6">
                         <h5 class="mb-3">Información Personal</h5>
-                        
+
                         <div class="mb-3">
                             <label for="id_type" class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
                             <select class="form-select" id="id_type" name="id_type" required>
@@ -22,65 +22,65 @@
                                 <option value="CE" {% if student and student.id_type == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
                             </select>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="id_number" class="form-label">Número de Documento <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="id_number" name="id_number" value="{{ student.id_number if student else '' }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="first_name" class="form-label">Nombres <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="first_name" name="first_name" value="{{ student.first_name if student else '' }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="last_name" class="form-label">Apellidos <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="last_name" name="last_name" value="{{ student.last_name if student else '' }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="birth_date" class="form-label">Fecha de Nacimiento <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" id="birth_date" name="birth_date" 
-                                   value="{{ student.birth_date.strftime('%Y-%m-%d') if student and student.birth_date else '' }}" required>
+                            <input type="date" class="form-control" id="birth_date" name="birth_date"
+                                value="{{ student.birth_date.strftime('%Y-%m-%d') if student and student.birth_date else '' }}" required>
                         </div>
                     </div>
-                    
+
                     <!-- Información de Contacto -->
                     <div class="col-md-6">
                         <h5 class="mb-3">Información de Contacto</h5>
-                        
+
                         <div class="mb-3">
                             <label for="residence_city" class="form-label">Ciudad de Residencia</label>
                             <input type="text" class="form-control" id="residence_city" name="residence_city" value="{{ student.residence_city if student else '' }}">
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="address" class="form-label">Dirección</label>
                             <input type="text" class="form-control" id="address" name="address" value="{{ student.address if student else '' }}">
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" class="form-control" id="email" name="email" value="{{ student.email if student else '' }}" required>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="phone_landline" class="form-label">Teléfono Fijo</label>
                             <input type="text" class="form-control" id="phone_landline" name="phone_landline" value="{{ student.phone_landline if student else '' }}">
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="phone_mobile" class="form-label">Celular</label>
                             <input type="text" class="form-control" id="phone_mobile" name="phone_mobile" value="{{ student.phone_mobile if student else '' }}">
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="guardian_full_name" class="form-label">Nombre Completo del Acudiente</label>
                             <input type="text" class="form-control" id="guardian_full_name" name="guardian_full_name" value="{{ student.guardian_full_name if student else '' }}">
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Información Académica -->
                 <hr class="my-4">
                 <div class="row">
@@ -97,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-4">
                     <button type="submit" id="submitBtn" class="btn btn-primary" disabled>Guardar</button>
                     {% if student_id %}
@@ -115,10 +115,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('studentForm');
     const submitButton = document.getElementById('submitBtn');
-    
-    // Select only the required fields
+
     const requiredFields = form.querySelectorAll('input[required], select[required]');
-    
+
     function validateForm() {
         let allValid = true;
         requiredFields.forEach(field => {
@@ -129,15 +128,13 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.disabled = !allValid;
     }
 
-    // Add event listeners to required fields
     requiredFields.forEach(field => {
         field.addEventListener('input', validateForm);
-        field.addEventListener('change', validateForm); // For select elements
+        field.addEventListener('change', validateForm);
     });
 
-    // Initial validation check
-    validateForm(); 
+    validateForm();
 });
 </script>
 
-{% endblock %} 
+{% endblock %}
