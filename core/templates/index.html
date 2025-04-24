@@ -2,20 +2,20 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="jumbotron">
+    <div class="jumbotron bg-light p-5 rounded-lg shadow-sm">
         <h1 class="display-4">Bienvenido a la Gestión Escolar</h1>
         <p class="lead">Institución Educativa "El Futuro del Saber"</p>
         <hr class="my-4">
         <p>Sistema de administración para estudiantes, docentes y asignaturas.</p>
         <div class="row mt-4">
-            <div class="col-md-6">
+            <div class="col-md-6 mb-4">
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header">
                         <h5 class="mb-0">Estado del Sistema</h5>
                     </div>
                     <div class="card-body">
                         <p><strong>Estado de la Base de Datos:</strong> 
-                            <span class="badge {% if db_status == 'Conectado' %}badge-success{% else %}badge-danger{% endif %}">
+                            <span class="badge {% if db_status == 'Conectado' %}badge-success{% elif 'Error' in db_status %}badge-danger{% else %}badge-warning{% endif %}">
                                 {{ db_status }}
                             </span>
                         </p>
@@ -26,84 +26,65 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-4">
                 <div class="card">
-                    <div class="card-header bg-success text-white">
+                    <div class="card-header">
                         <h5 class="mb-0">Estadísticas</h5>
                     </div>
                     <div class="card-body">
-                        <p><strong>Total de Estudiantes:</strong> {{ student_count }}</p>
-                        <p><strong>Total de Docentes:</strong> {{ teacher_count }}</p>
-                        <p><strong>Total de Asignaturas:</strong> {{ subject_count }}</p>
-                        <p><strong>Total de Grados:</strong> {{ grade_count }}</p>
+                        <p><strong>Total de Estudiantes:</strong> <span class="badge badge-info">{{ student_count }}</span></p>
+                        <p><strong>Total de Docentes:</strong> <span class="badge badge-info">{{ teacher_count }}</span></p>
+                        <p><strong>Total de Asignaturas:</strong> <span class="badge badge-info">{{ subject_count }}</span></p>
+                        <p><strong>Total de Grados:</strong> <span class="badge badge-info">{{ grade_count }}</span></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <h2 class="mb-4">Accesos Rápidos</h2>
     <div class="row mt-4">
         <div class="col-md-3">
             <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Gestión de Estudiantes</h4>
+                <div class="card-header">
+                    <h4 class="mb-0 h5">Estudiantes</h4>
                 </div>
                 <div class="card-body">
-                    <p>Administre la información de los estudiantes de la institución.</p>
-                    <ul>
-                        <li>Registro de estudiantes</li>
-                        <li>Asignación a grados</li>
-                        <li>Información de contacto</li>
-                    </ul>
-                    <a href="{{ url_for('students.list_students') }}" class="btn btn-primary btn-block">Acceder</a>
+                    <p>Gestión de estudiantes, inscripciones y detalles.</p>
+                    <a href="{{ url_for('students.list_students') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Gestión de Docentes</h4>
+                <div class="card-header">
+                    <h4 class="mb-0 h5">Docentes</h4>
                 </div>
                 <div class="card-body">
-                    <p>Administre la información de los docentes de la institución.</p>
-                    <ul>
-                        <li>Datos personales</li>
-                        <li>Información profesional</li>
-                        <li>Asignaturas a cargo</li>
-                    </ul>
-                    <a href="{{ url_for('teachers.list_teachers') }}" class="btn btn-primary btn-block">Acceder</a>
+                    <p>Gestión de docentes, asignaturas y datos.</p>
+                    <a href="{{ url_for('teachers.list_teachers') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Gestión de Asignaturas</h4>
+                <div class="card-header">
+                    <h4 class="mb-0 h5">Asignaturas</h4>
                 </div>
                 <div class="card-body">
-                    <p>Administre las asignaturas y la inscripción de estudiantes.</p>
-                    <ul>
-                        <li>Creación de asignaturas</li>
-                        <li>Asignación de docentes</li>
-                        <li>Inscripción de estudiantes</li>
-                    </ul>
-                    <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-primary btn-block">Acceder</a>
+                    <p>Gestión de asignaturas, profesores y estudiantes.</p>
+                    <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">Gestión de Grados</h4>
+                <div class="card-header">
+                    <h4 class="mb-0 h5">Grados</h4>
                 </div>
                 <div class="card-body">
-                    <p>Administre los grados escolares de la institución.</p>
-                    <ul>
-                        <li>Creación de grados</li>
-                        <li>Asignación de directores</li>
-                        <li>Visualización de estudiantes</li>
-                    </ul>
-                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-primary btn-block">Acceder</a>
+                    <p>Gestión de grados, directores y estudiantes.</p>
+                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-primary btn-block mt-3">Acceder</a>
                 </div>
             </div>
         </div>

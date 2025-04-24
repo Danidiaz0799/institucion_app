@@ -22,53 +22,50 @@
         {% endif %}
     {% endwith %}
 
-    <div class="row">
-        <!-- Estudiantes Inscritos -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">Estudiantes Inscritos</div>
-                <div class="card-body">
-                    {% if enrolled_students %}
-                        <ul class="list-group">
-                            {% for student in enrolled_students %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    {{ student.first_name }} {{ student.last_name }}
-                                    <form action="{{ url_for('subjects.remove_student', subject_id=subject.subject_id, student_id=student.student_id) }}" method="POST" style="display: inline;">
-                                        <button type="submit" class="btn btn-sm btn-danger">Quitar</button>
-                                    </form>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">No hay estudiantes inscritos en esta asignatura.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Añadir Estudiantes -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">Añadir Estudiantes</div>
-                <div class="card-body">
-                    {% if available_students %}
-                        <form method="POST" action="{{ url_for('subjects.add_student', subject_id=subject.subject_id) }}">
+    <div class="card">
+        <div class="card-body">
+            <form method="POST">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Estudiantes Inscritos</h5>
+                        {% if enrolled_students %}
+                            <ul class="list-group mb-3">
+                                {% for student in enrolled_students %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        {{ student.first_name }} {{ student.last_name }}
+                                        <button type="submit" name="remove_student" value="{{ student.student_id }}" class="btn btn-danger btn-sm">Quitar</button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted">No hay estudiantes inscritos en esta asignatura.</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Estudiantes Disponibles (del mismo grado)</h5>
+                        {% if available_students %}
                             <div class="form-group">
-                                <label for="student_id">Seleccionar Estudiante</label>
-                                <select class="form-control" id="student_id" name="student_id" required>
-                                    <option value="" disabled selected>-- Elige un estudiante --</option>
+                                <label for="add_student">Seleccionar estudiante para inscribir:</label>
+                                <select name="add_student" id="add_student" class="form-control mb-2">
+                                    <option value="" disabled selected>-- Seleccione un estudiante --</option>
                                     {% for student in available_students %}
-                                        <option value="{{ student.student_id }}">{{ student.first_name }} {{ student.last_name }}</option>
+                                        <option value="{{ student.student_id }}">{{ student.first_name }} {{ student.last_name }} (ID: {{ student.student_id }})</option>
                                     {% endfor %}
                                 </select>
+                                <button type="submit" class="btn btn-success">Inscribir Estudiante</button>
                             </div>
-                            <button type="submit" class="btn btn-success">Añadir a la Asignatura</button>
-                        </form>
-                    {% else %}
-                        <p class="text-muted">Todos los estudiantes ya están inscritos o no hay estudiantes disponibles.</p>
-                    {% endif %}
+                        {% else %}
+                            <p class="text-muted">No hay estudiantes disponibles en el grado de esta asignatura para inscribir.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+                
+                <hr>
+                
+                <div class="mt-3">
+                    <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-secondary">Volver a la lista de Asignaturas</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
