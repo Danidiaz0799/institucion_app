@@ -143,11 +143,11 @@ def get_teacher_subjects(db_config, teacher_id):
     
     try:
         if conn and cursor:
+            # Corregir la consulta para usar la columna teacher_id en la tabla subjects
             cursor.execute("""
                 SELECT s.* 
                 FROM subjects s
-                JOIN subject_teacher st ON s.subject_id = st.subject_id
-                WHERE st.teacher_id = %s
+                WHERE s.teacher_id = %s
                 ORDER BY s.subject_name
             """, (teacher_id,))
             subjects = cursor.fetchall()
