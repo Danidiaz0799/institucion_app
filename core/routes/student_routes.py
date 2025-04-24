@@ -25,7 +25,10 @@ def student_detail(student_id):
     try:
         student = get_student_by_id(current_app.config['DB_CONFIG'], student_id)
         if student:
-            return render_template('students/detail.html', student=student, title='Detalles del Estudiante')
+            # Obtener las asignaturas en las que está inscrito el estudiante
+            from core.db.subject_db import get_student_subjects
+            enrolled_subjects = get_student_subjects(current_app.config['DB_CONFIG'], student_id)
+            return render_template('students/detail.html', student=student, enrolled_subjects=enrolled_subjects, title='Detalles del Estudiante')
         else:
             flash("Estudiante no encontrado.", "error")
             return redirect(url_for('students.list_students'))

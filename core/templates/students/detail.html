@@ -92,6 +92,41 @@
             </div>
         </div>
 
+        <!-- Sección de Asignaturas Inscritas -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Asignaturas Inscritas</h5>
+            </div>
+            <div class="card-body">
+                {% if enrolled_subjects %}
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nombre de la Asignatura</th>
+                                <th>Profesor Asignado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in enrolled_subjects %}
+                                <tr>
+                                    <td>{{ subject.subject_name }}</td>
+                                    <td>
+                                        {% if subject.teacher_first_name %}
+                                            {{ subject.teacher_first_name }} {{ subject.teacher_last_name }}
+                                        {% else %}
+                                            <em>Sin profesor asignado</em>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-muted">Este estudiante no está inscrito en ninguna asignatura.</p>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- Modal de confirmación para eliminar -->
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -125,4 +160,4 @@
         <a href="{{ url_for('students.list_students') }}" class="btn btn-secondary">Volver a la lista</a>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

@@ -44,7 +44,7 @@
                     </td>
                     <td>
                         <a href="{{ url_for('subjects.edit_subject', subject_id=subject.subject_id) }}" class="btn btn-sm btn-primary">Editar</a>
-                        <a href="{{ url_for('subjects.manage_subject_students', subject_id=subject.subject_id) }}" class="btn btn-sm btn-info">Gestionar Estudiantes</a>
+                        <a href="{{ url_for('subjects.manage_subject_students', subject_id=subject.subject_id) }}" class="btn btn-sm btn-info">Inscribir Estudiantes</a>
                         <form action="{{ url_for('subjects.delete_subject_post', subject_id=subject.subject_id) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta asignatura?');">
                             <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
                         </form>

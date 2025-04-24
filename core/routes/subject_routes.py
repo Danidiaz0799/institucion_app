@@ -110,6 +110,8 @@ def delete_subject_post(subject_id):
         flash(f"Error al eliminar asignatura: {str(e)}", "error")
         return redirect(url_for('subjects.list_subjects'))
 
+# --- Rutas para gestionar estudiantes en asignaturas --- 
+
 @subjects_bp.route('/<int:subject_id>/manage', methods=['GET'])
 def manage_subject_students(subject_id):
     """Muestra la interfaz para gestionar estudiantes de una asignatura."""
@@ -143,13 +145,13 @@ def add_student(subject_id):
         success = assign_student_to_subject(current_app.config['DB_CONFIG'], student_id, subject_id)
         
         if success:
-            flash("Estudiante añadido exitosamente", "success")
+            flash("Estudiante inscrito en la asignatura exitosamente", "success")
         else:
-            flash("Error al añadir estudiante", "error")
+            flash("Error al inscribir estudiante en la asignatura", "error")
         
         return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
     except Exception as e:
-        flash(f"Error al añadir estudiante: {str(e)}", "error")
+        flash(f"Error al inscribir estudiante: {str(e)}", "error")
         return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
 
 @subjects_bp.route('/<int:subject_id>/remove_student/<int:student_id>', methods=['POST'])
@@ -159,11 +161,11 @@ def remove_student(subject_id, student_id):
         success = remove_student_from_subject(current_app.config['DB_CONFIG'], student_id, subject_id)
         
         if success:
-            flash("Estudiante eliminado exitosamente", "success")
+            flash("Inscripción de estudiante eliminada exitosamente", "success")
         else:
-            flash("Error al eliminar estudiante", "error")
+            flash("Error al eliminar inscripción", "error")
         
         return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
     except Exception as e:
-        flash(f"Error al eliminar estudiante: {str(e)}", "error")
+        flash(f"Error al eliminar inscripción: {str(e)}", "error")
         return redirect(url_for('subjects.manage_subject_students', subject_id=subject_id))
