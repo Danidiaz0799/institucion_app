@@ -1,0 +1,234 @@
+from mysql.connector import Error
+from .connection import get_db_connection, close_connection
+
+def get_all_subjects(db_config):
+    """Obtiene todas las asignaturas con información del profesor."""
+    conn, cursor = get_db_connection(db_config)
+    subjects = []
+    if not conn:
+        return subjects
+
+    try:
+        query = """
+        SELECT s.subject_id, s.subject_name, s.teacher_id, 
+               t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+        FROM subjects s
+        LEFT JOIN teachers t ON s.teacher_id = t.teacher_id
+        ORDER BY s.subject_name
+        """
+        cursor.execute(query)
+        subjects = cursor.fetchall()
+    except Error as e:
+        print(f"Error en get_all_subjects: {e}")
+        # Consider logging the error
+    finally:
+        close_connection(conn, cursor)
+    return subjects
+
+def get_subject_by_id(db_config, subject_id):
+    """Obtiene una asignatura por su ID."""
+    conn, cursor = get_db_connection(db_config)
+    subject = None
+    if not conn:
+        return subject
+
+    try:
+        query = """
+        SELECT s.subject_id, s.subject_name, s.teacher_id,
+               t.first_name AS teacher_first_name, t.last_name AS teacher_last_name
+        FROM subjects s
+        LEFT JOIN teachers t ON s.teacher_id = t.teacher_id
+        WHERE s.subject_id = %s
+        """
+        cursor.execute(query, (subject_id,))
+        subject = cursor.fetchone()
+    except Error as e:
+        print(f"Error en get_subject_by_id: {e}")
+    finally:
+        close_connection(conn, cursor)
+    return subject
+
+def get_subject_students(db_config, subject_id):
+    """Obtiene todos los estudiantes inscritos en una asignatura."""
+    conn, cursor = get_db_connection(db_config)
+    students = []
+    if not conn:
+        return students
+
+    try:
+        # Asumiendo que existe una tabla de unión llamada student_subjects
+        # Si no existe, esta consulta fallará y necesitará ser creada/ajustada.
+        query = """
+        SELECT s.student_id, s.first_name, s.last_name, s.email
+        FROM students s
+        JOIN student_subjects ss ON s.student_id = ss.student_id
+        WHERE ss.subject_id = %s
+        ORDER BY s.last_name, s.first_name
+        """
+        cursor.execute(query, (subject_id,))
+        students = cursor.fetchall()
+    except Error as e:
+        print(f"Error en get_subject_students: {e}")
+        # Podría ser que la tabla student_subjects no exista
+        # Considera crearla si es necesario
+    finally:
+        close_connection(conn, cursor)
+    return students
+
+def create_subject(db_config, subject_name, teacher_id):
+    """Crea una nueva asignatura."""
+    conn, cursor = get_db_connection(db_config)
+    subject_id = None
+    if not conn:
+        return subject_id
+
+    try:
+        # Asegurarse de que teacher_id sea None si está vacío o es 0, si la FK lo permite
+        teacher_id_to_insert = teacher_id if teacher_id else None 
+        cursor.execute(
+            "INSERT INTO subjects (subject_name, teacher_id) VALUES (%s, %s)",
+            (subject_name, teacher_id_to_insert)
+        )
+        conn.commit()
+        subject_id = cursor.lastrowid
+    except Error as e:
+        print(f"Error en create_subject: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        close_connection(conn, cursor)
+    return subject_id
+
+def update_subject(db_config, subject_id, subject_name, teacher_id):
+    """Actualiza una asignatura existente."""
+    conn, cursor = get_db_connection(db_config)
+    success = False
+    if not conn:
+        return success
+
+    try:
+        # Asegurarse de que teacher_id sea None si está vacío o es 0, si la FK lo permite
+        teacher_id_to_update = teacher_id if teacher_id else None
+        cursor.execute(
+            "UPDATE subjects SET subject_name = %s, teacher_id = %s WHERE subject_id = %s",
+            (subject_name, teacher_id_to_update, subject_id)
+        )
+        conn.commit()
+        success = cursor.rowcount > 0
+    except Error as e:
+        print(f"Error en update_subject: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        close_connection(conn, cursor)
+    return success
+
+def delete_subject(db_config, subject_id):
+    """Elimina una asignatura y sus relaciones con estudiantes."""
+    conn, cursor = get_db_connection(db_config)
+    success = False
+    if not conn:
+        return success
+
+    try:
+        # Primero eliminar de la tabla de unión (si existe)
+        # Asumiendo que se llama student_subjects
+        try:
+            cursor.execute("DELETE FROM student_subjects WHERE subject_id = %s", (subject_id,))
+        except Error as e:
+            # Si la tabla no existe, puede que no sea un problema grave, pero loguearlo
+            print(f"Nota: No se pudo eliminar de student_subjects (puede que no exista): {e}")
+
+        # Luego eliminar la asignatura
+        cursor.execute("DELETE FROM subjects WHERE subject_id = %s", (subject_id,))
+        conn.commit()
+        success = cursor.rowcount > 0
+    except Error as e:
+        print(f"Error en delete_subject: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        close_connection(conn, cursor)
+    return success
+
+# --- Funciones para gestionar estudiantes en asignaturas --- 
+# Estas funciones asumen una tabla de unión 'student_subjects'
+# con columnas 'student_id' y 'subject_id'
+
+def get_students_not_in_subject(db_config, subject_id):
+    """Obtiene estudiantes que NO están inscritos en una asignatura específica."""
+    conn, cursor = get_db_connection(db_config)
+    students = []
+    if not conn:
+        return students
+    try:
+        query = """
+        SELECT s.student_id, s.first_name, s.last_name
+        FROM students s
+        WHERE s.student_id NOT IN (
+            SELECT ss.student_id 
+            FROM student_subjects ss 
+            WHERE ss.subject_id = %s
+        )
+        ORDER BY s.last_name, s.first_name
+        """
+        cursor.execute(query, (subject_id,))
+        students = cursor.fetchall()
+    except Error as e:
+        print(f"Error en get_students_not_in_subject: {e}")
+    finally:
+        close_connection(conn, cursor)
+    return students
+
+def assign_student_to_subject(db_config, student_id, subject_id):
+    """Asigna un estudiante a una asignatura."""
+    conn, cursor = get_db_connection(db_config)
+    success = False
+    if not conn:
+        return success
+
+    try:
+        # Verificar si ya existe la asignación para evitar duplicados
+        cursor.execute(
+            "SELECT 1 FROM student_subjects WHERE student_id = %s AND subject_id = %s",
+            (student_id, subject_id)
+        )
+        if cursor.fetchone():
+            return True # Ya asignado
+
+        # Crear la relación
+        cursor.execute(
+            "INSERT INTO student_subjects (student_id, subject_id) VALUES (%s, %s)",
+            (student_id, subject_id)
+        )
+        conn.commit()
+        success = True
+    except Error as e:
+        print(f"Error en assign_student_to_subject: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        close_connection(conn, cursor)
+    return success
+
+def remove_student_from_subject(db_config, student_id, subject_id):
+    """Elimina un estudiante de una asignatura."""
+    conn, cursor = get_db_connection(db_config)
+    success = False
+    if not conn:
+        return success
+
+    try:
+        cursor.execute(
+            "DELETE FROM student_subjects WHERE student_id = %s AND subject_id = %s",
+            (student_id, subject_id)
+        )
+        conn.commit()
+        success = cursor.rowcount > 0
+    except Error as e:
+        print(f"Error en remove_student_from_subject: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        close_connection(conn, cursor)
+    return success

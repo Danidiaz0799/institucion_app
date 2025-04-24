@@ -54,45 +54,75 @@ def get_db_connection():
 # Ruta principal (Index) - Modificada para probar la conexión a la BD (sin cambios recientes)
 @app.route('/')
 def index():
-    """Página principal, ahora también prueba la conexión a la BD."""
+    """Página principal con estadísticas y estado del sistema."""
     conn = None
     cursor = None
     db_status = "Desconectado"
     db_name = "N/A"
+    student_count = 0
+    teacher_count = 0
+    subject_count = 0
+    current_date = ""
 
     try:
+        from datetime import datetime
+        current_date = datetime.now().strftime("%d/%m/%Y")
+        
         conn, cursor = get_db_connection()
         if conn and conn.is_connected() and cursor:
+            # Obtener el nombre de la base de datos
             cursor.execute("SELECT DATABASE();")
             result = cursor.fetchone()
             if result:
                 db_name = result['DATABASE()']
                 db_status = "Conectado"
-                # print(f"Conexión exitosa a la base de datos: {db_name}") # Ya no es necesario aquí
             else:
-                 db_status = "Conectado, pero no se pudo obtener el nombre de la BD."
+                db_status = "Conectado, pero no se pudo obtener el nombre de la BD."
+            
+            # Obtener conteo de estudiantes
+            cursor.execute("SELECT COUNT(*) as count FROM students")
+            result = cursor.fetchone()
+            student_count = result['count'] if result else 0
+            
+            # Obtener conteo de profesores
+            cursor.execute("SELECT COUNT(*) as count FROM teachers")
+            result = cursor.fetchone()
+            teacher_count = result['count'] if result else 0
+            
+            # Obtener conteo de asignaturas
+            cursor.execute("SELECT COUNT(*) as count FROM subjects")
+            result = cursor.fetchone()
+            subject_count = result['count'] if result else 0
         else:
-             # Este es el mensaje que probablemente ves en la web ahora
-             db_status = "Error al obtener conexión/cursor."
+            db_status = "Error al obtener conexión/cursor."
 
     except Error as e:
         db_status = f"Error de consulta: {e}"
-        # print(f"Error durante la consulta de prueba: {e}") # Ya no es necesario aquí
-
+    except Exception as e:
+        print(f"Error no esperado: {e}")
     finally:
         if cursor:
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
 
-    return render_template('index.html', title='Inicio', db_status=db_status, db_name=db_name)
+    return render_template('index.html', 
+                          title='Inicio', 
+                          db_status=db_status, 
+                          db_name=db_name,
+                          current_date=current_date,
+                          student_count=student_count,
+                          teacher_count=teacher_count,
+                          subject_count=subject_count)
 
 # Importar e registrar los blueprints
 from core.routes.student_routes import students_bp
 from core.routes.teacher_routes import teachers_bp
+from core.routes.subject_routes import subjects_bp
 
 app.register_blueprint(students_bp, url_prefix='/students')
 app.register_blueprint(teachers_bp, url_prefix='/teachers')
+app.register_blueprint(subjects_bp, url_prefix='/subjects')
 
 # Actualizar el enlace en index.html
 @app.route('/update_index')
