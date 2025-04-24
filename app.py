@@ -62,6 +62,7 @@ def index():
     student_count = 0
     teacher_count = 0
     subject_count = 0
+    grade_count = 0
     current_date = ""
 
     try:
@@ -93,6 +94,11 @@ def index():
             cursor.execute("SELECT COUNT(*) as count FROM subjects")
             result = cursor.fetchone()
             subject_count = result['count'] if result else 0
+            
+            # Obtener conteo de grados
+            cursor.execute("SELECT COUNT(*) as count FROM grades")
+            result = cursor.fetchone()
+            grade_count = result['count'] if result else 0
         else:
             db_status = "Error al obtener conexión/cursor."
 
@@ -113,16 +119,19 @@ def index():
                           current_date=current_date,
                           student_count=student_count,
                           teacher_count=teacher_count,
-                          subject_count=subject_count)
+                          subject_count=subject_count,
+                          grade_count=grade_count)
 
 # Importar e registrar los blueprints
 from core.routes.student_routes import students_bp
 from core.routes.teacher_routes import teachers_bp
 from core.routes.subject_routes import subjects_bp
+from core.routes.grade_routes import grades_bp
 
 app.register_blueprint(students_bp, url_prefix='/students')
 app.register_blueprint(teachers_bp, url_prefix='/teachers')
 app.register_blueprint(subjects_bp, url_prefix='/subjects')
+app.register_blueprint(grades_bp, url_prefix='/grades')
 
 # Actualizar el enlace en index.html
 @app.route('/update_index')

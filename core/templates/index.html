@@ -35,6 +35,7 @@
                         <p><strong>Total de Estudiantes:</strong> {{ student_count }}</p>
                         <p><strong>Total de Docentes:</strong> {{ teacher_count }}</p>
                         <p><strong>Total de Asignaturas:</strong> {{ subject_count }}</p>
+                        <p><strong>Total de Grados:</strong> {{ grade_count }}</p>
                     </div>
                 </div>
             </div>
@@ -42,7 +43,7 @@
     </div>
 
     <div class="row mt-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card mb-4">
                 <div class="card-header bg-info text-white">
                     <h4 class="mb-0">Gestión de Estudiantes</h4>
@@ -58,7 +59,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card mb-4">
                 <div class="card-header bg-info text-white">
                     <h4 class="mb-0">Gestión de Docentes</h4>
@@ -74,7 +75,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card mb-4">
                 <div class="card-header bg-info text-white">
                     <h4 class="mb-0">Gestión de Asignaturas</h4>
@@ -87,6 +88,22 @@
                         <li>Inscripción de estudiantes</li>
                     </ul>
                     <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-primary btn-block">Acceder</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Gestión de Grados</h4>
+                </div>
+                <div class="card-body">
+                    <p>Administre los grados escolares de la institución.</p>
+                    <ul>
+                        <li>Creación de grados</li>
+                        <li>Asignación de directores</li>
+                        <li>Visualización de estudiantes</li>
+                    </ul>
+                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-primary btn-block">Acceder</a>
                 </div>
             </div>
         </div>

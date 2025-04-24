@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ title }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" novalidate>
+                <div class="form-group">
+                    <label for="grade_name">Nombre del Grado</label>
+                    <input type="text" class="form-control" id="grade_name" name="grade_name" 
+                           value="{{ grade.grade_name if grade else '' }}" required>
+                    <small class="form-text text-muted">Ejemplo: "Primero A", "Segundo B", "Tercero C"</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="director_teacher_id">Director de Grupo</label>
+                    <select class="form-control" id="director_teacher_id" name="director_teacher_id">
+                        <option value="" {% if not grade or not grade.director_teacher_id %}selected{% endif %}>-- Sin asignar --</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.teacher_id }}" 
+                                    {% if grade and grade.director_teacher_id == teacher.teacher_id %}selected{% endif %}>
+                                {{ teacher.first_name }} {{ teacher.last_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">Seleccione un profesor para dirigir este grado. Puede dejarlo sin asignar.</small>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
