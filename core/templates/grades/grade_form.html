@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" id="gradeForm" novalidate>
+                <div class="mb-3">
+                    <label for="grade_name" class="form-label">Nombre del Grado <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="grade_name" name="grade_name"
+                        value="{{ grade.grade_name if grade else '' }}" required>
+                    <div class="form-text text-muted">Ejemplo: "Primero A", "Segundo B", "Tercero C"</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="director_teacher_id" class="form-label">Director de Grupo</label>
+                    <select class="form-select" id="director_teacher_id" name="director_teacher_id">
+                        <option value="" {% if not grade or not grade.director_teacher_id %}selected{% endif %}>-- Sin asignar --</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.teacher_id }}"
+                                    {% if grade and grade.director_teacher_id == teacher.teacher_id %}selected{% endif %}>
+                                {{ teacher.first_name }} {{ teacher.last_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text text-muted">Seleccione un profesor para dirigir este grado. Puede dejarlo sin asignar.</div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" id="submitBtn" class="btn btn-primary" disabled>Guardar</button>
+                    <a href="{{ url_for('grades.list_grades') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('gradeForm');
+    const submitButton = document.getElementById('submitBtn');
+
+    const requiredFields = form.querySelectorAll('input[required], select[required]');
+
+    function validateForm() {
+        let allValid = true;
+        requiredFields.forEach(field => {
+            if (!field.value || (field.tagName === 'SELECT' && field.value === "")) {
+                allValid = false;
+            }
+        });
+        submitButton.disabled = !allValid;
+    }
+
+    requiredFields.forEach(field => {
+        field.addEventListener('input', validateForm);
+        field.addEventListener('change', validateForm);
+    });
+
+    validateForm();
+});
+</script>
+
+{% endblock %}

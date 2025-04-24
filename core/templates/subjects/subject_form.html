@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ title }}</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="POST" id="subjectForm" novalidate>
+                <div class="mb-3">
+                    <label for="subject_name" class="form-label">Nombre de la Asignatura <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="subject_name" name="subject_name"
+                        value="{{ subject.subject_name if subject else '' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="teacher_id" class="form-label">Profesor Asignado</label>
+                    <select class="form-select" id="teacher_id" name="teacher_id">
+                        <option value="" {% if not subject or not subject.teacher_id %}selected{% endif %}>-- Sin asignar --</option>
+                        {% for teacher in teachers %}
+                            <option value="{{ teacher.teacher_id }}"
+                                    {% if subject and subject.teacher_id == teacher.teacher_id %}selected{% endif %}>
+                                {{ teacher.first_name }} {{ teacher.last_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text text-muted">Puedes dejar esto sin asignar por ahora.</div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" id="submitBtn" class="btn btn-primary" disabled>Guardar</button>
+                    <a href="{{ url_for('subjects.list_subjects') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('subjectForm');
+    const submitButton = document.getElementById('submitBtn');
+
+    const requiredFields = form.querySelectorAll('input[required], select[required]');
+
+    function validateForm() {
+        let allValid = true;
+        requiredFields.forEach(field => {
+            if (!field.value || (field.tagName === 'SELECT' && field.value === "")) {
+                allValid = false;
+            }
+        });
+        submitButton.disabled = !allValid;
+    }
+
+    requiredFields.forEach(field => {
+        field.addEventListener('input', validateForm);
+        field.addEventListener('change', validateForm);
+    });
+
+    validateForm();
+});
+</script>
+
+{% endblock %}

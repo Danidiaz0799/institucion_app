@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Asignaturas{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        <a href="{{ url_for('subjects.new_subject') }}" class="btn btn-success">Nueva Asignatura</a>
+    </div>
+    <p>Listado de todas las asignaturas registradas.</p>
+
+    {% if subjects %}
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Nombre Asignatura</th>
+                        <th scope="col">Profesor Asignado</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                        <tr>
+                            <td data-label="ID">{{ subject.subject_id }}</td>
+                            <td data-label="Nombre">{{ subject.subject_name }}</td>
+                            <td data-label="Profesor">
+                                {# Combine first and last name if available #}
+                                {% if subject.teacher_first_name %}
+                                    {{ subject.teacher_first_name }} {{ subject.teacher_last_name }}
+                                {% else %}
+                                    <em class="text-muted">Sin asignar</em>
+                                {% endif %}
+                            </td>
+                            <td data-label="Acciones">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('subjects.edit_subject', subject_id=subject.subject_id) }}" class="btn btn-warning">Editar</a>
+                                    <a href="{{ url_for('subjects.manage_subject_students', subject_id=subject.subject_id) }}" class="btn btn-info">Inscribir Estudiantes</a>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ subject.subject_id }}">Eliminar</button>
+                                </div>
+
+                                <!-- Modal de confirmación para eliminar -->
+                                <div class="modal fade" id="deleteModal{{ subject.subject_id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ subject.subject_id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ subject.subject_id }}">Confirmar eliminación</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ¿Está seguro que desea eliminar la asignatura <strong>{{ subject.subject_name }}</strong>?
+                                                <p class="text-danger mt-2"><small>Esta acción no se puede deshacer y desvinculará a los estudiantes inscritos.</small></p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <form action="{{ url_for('subjects.delete_subject_post', subject_id=subject.subject_id) }}" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            No hay asignaturas registradas. <a href="{{ url_for('subjects.new_subject') }}" class="alert-link">Crear la primera</a>.
+        </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Volver al inicio</a>
+    </div>
+</div>
+{% endblock %}

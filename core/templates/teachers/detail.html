@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>{{ title }}</h1>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        {% if teacher %}
+            <div>
+                <a href="{{ url_for('teachers.edit_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button>
+            </div>
+        {% endif %}
+    </div>
 
     {% if teacher %}
-        <div class="card">
-            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">{{ teacher.first_name }} {{ teacher.last_name }}</h5>
-                <div>
-                    <a href="{{ url_for('teachers.edit_teacher', teacher_id=teacher.teacher_id) }}" class="btn btn-warning btn-sm">Editar</a>
-                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal">Eliminar</button>
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Información del Docente</h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -19,125 +23,137 @@
                         <h6>Información Personal</h6>
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">ID:</span>
+                                <strong>ID:</strong>
                                 <span>{{ teacher.teacher_id }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Tipo Documento:</span>
+                                <strong>Tipo Documento:</strong>
                                 <span>{{ teacher.id_type }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Número Documento:</span>
+                                <strong>Número Documento:</strong>
                                 <span>{{ teacher.id_number }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Nombres:</span>
+                                <strong>Nombres:</strong>
                                 <span>{{ teacher.first_name }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Apellidos:</span>
+                                <strong>Apellidos:</strong>
                                 <span>{{ teacher.last_name }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Fecha de Nacimiento:</span>
-                                <span>{{ teacher.birth_date }}</span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Nivel Educativo:</span>
-                                <span>{{ teacher.education_level }}</span>
+                                <strong>Fecha de Nacimiento:</strong>
+                                <span>{{ teacher.birth_date.strftime('%d/%m/%Y') if teacher.birth_date else 'N/A' }}</span>
                             </li>
                         </ul>
                     </div>
                     <div class="col-md-6">
-                        <h6>Información de Contacto</h6>
+                        <h6>Información de Contacto y Profesional</h6>
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Email:</span>
-                                <span>{{ teacher.email }}</span>
+                                <strong>Email:</strong>
+                                <span>{{ teacher.email if teacher.email else 'N/A' }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Teléfono Fijo:</span>
-                                <span>{{ teacher.phone_landline }}</span>
+                                <strong>Teléfono Fijo:</strong>
+                                <span>{{ teacher.phone_landline if teacher.phone_landline else 'N/A' }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                <span class="font-weight-bold">Celular:</span>
-                                <span>{{ teacher.phone_mobile }}</span>
+                                <strong>Celular:</strong>
+                                <span>{{ teacher.phone_mobile if teacher.phone_mobile else 'N/A' }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong>Nivel Educativo:</strong>
+                                <span>{{ teacher.education_level if teacher.education_level else 'N/A' }}</span>
                             </li>
                         </ul>
                     </div>
                 </div>
-                
+            </div>
+        </div>
+
+        <!-- Sección de Asignaturas Asignadas -->
+        <div class="card mt-4 mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Asignaturas Asignadas</h5>
+            </div>
+            <div class="card-body p-0">
                 {% if subjects %}
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <h6>Asignaturas Asignadas</h6>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-bordered">
-                                <thead class="thead-light">
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nombre de la Asignatura</th>
+                                    <th scope="col">ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subjects %}
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Nombre</th>
+                                        <td data-label="Asignatura">{{ subject.subject_name }}</td>
+                                        <td data-label="ID">{{ subject.subject_id }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {% for subject in subjects %}
-                                        <tr>
-                                            <td>{{ subject.subject_id }}</td>
-                                            <td>{{ subject.subject_name }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                {% else %}
+                    <div class="p-3">
+                        <p class="text-muted mb-0">Este docente no tiene asignaturas asignadas.</p>
+                    </div>
                 {% endif %}
-                
+            </div>
+        </div>
+
+        <!-- Sección de Grados Dirigidos -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Grados Dirigidos</h5>
+            </div>
+            <div class="card-body p-0">
                 {% if grades %}
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <h6>Director de Grados</h6>
-                        <div class="table-responsive">
-                            <table class="table table-sm table-bordered">
-                                <thead class="thead-light">
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Nombre del Grado</th>
+                                    <th scope="col">ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for grade in grades %}
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Nombre</th>
+                                        <td data-label="Grado">{{ grade.grade_name }}</td>
+                                        <td data-label="ID">{{ grade.grade_id }}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {% for grade in grades %}
-                                        <tr>
-                                            <td>{{ grade.grade_id }}</td>
-                                            <td>{{ grade.grade_name }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                {% else %}
+                    <div class="p-3">
+                        <p class="text-muted mb-0">Este docente no es director de ningún grado.</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
 
         <!-- Modal de confirmación para eliminar -->
-        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         ¿Está seguro que desea eliminar al docente <strong>{{ teacher.first_name }} {{ teacher.last_name }}</strong>?
-                        <p class="text-danger mt-2">Esta acción no se puede deshacer.</p>
+                        <p class="text-danger mt-2"><small>Esta acción no se puede deshacer.</small></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <form action="{{ url_for('teachers.delete_teacher_route', teacher_id=teacher.teacher_id) }}" method="POST">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <form action="{{ url_for('teachers.delete_teacher_route', teacher_id=teacher.teacher_id) }}" method="POST" class="d-inline">
                             <button type="submit" class="btn btn-danger">Eliminar</button>
                         </form>
                     </div>
@@ -150,8 +166,8 @@
         </div>
     {% endif %}
 
-    <div class="mt-3">
+    <div class="mt-4">
         <a href="{{ url_for('teachers.list_teachers') }}" class="btn btn-secondary">Volver a la lista</a>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

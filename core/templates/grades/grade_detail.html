@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ title }}</h1>
+        {% if grade %}
+            <div>
+                <a href="{{ url_for('grades.edit_grade', grade_id=grade.grade_id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">Eliminar</button>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if grade %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Información del Grado</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>ID:</strong>
+                        <span>{{ grade.grade_id }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Nombre:</strong>
+                        <span>{{ grade.grade_name }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Director de Grupo:</strong>
+                        <span>
+                            {% if grade.teacher_first_name and grade.teacher_last_name %}
+                                {{ grade.teacher_first_name }} {{ grade.teacher_last_name }}
+                            {% else %}
+                                Sin asignar
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sección de Estudiantes -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Estudiantes en {{ grade.grade_name }}</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if students %}
+                    <div class="table-responsive shadow-sm">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Nombre Completo</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                    <tr>
+                                        <td data-label="ID">{{ student.student_id }}</td>
+                                        <td data-label="Nombre">{{ student.first_name }} {{ student.last_name }}</td>
+                                        <td data-label="Email">{{ student.email if student.email else 'N/A' }}</td>
+                                        <td data-label="Acciones">
+                                            <a href="{{ url_for('students.student_detail', student_id=student.student_id) }}" class="btn btn-info btn-sm">Ver Estudiante</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="p-3">
+                        <p class="text-muted mb-0">No hay estudiantes registrados en este grado.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Modal de confirmación para eliminar -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro que desea eliminar el grado <strong>{{ grade.grade_name }}</strong>?
+                        <p class="text-danger mt-2"><small>Esta acción no se puede deshacer y puede afectar a estudiantes y asignaturas asociadas.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <form action="{{ url_for('grades.delete_grade_route', grade_id=grade.grade_id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="alert alert-danger">
+            Grado no encontrado.
+        </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{{ url_for('grades.list_grades') }}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+</div>
+{% endblock %}

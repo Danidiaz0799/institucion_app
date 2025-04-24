@@ -4,6 +4,7 @@ import mysql.connector
 from mysql.connector import Error
 from flask import Flask, render_template, request, redirect, url_for, flash
 from dotenv import load_dotenv
+from datetime import datetime # Import datetime
 
 # Cargar variables de entorno desde el archivo .env, especificando la ruta
 # Guardamos el resultado para ver si encontró el archivo .env
@@ -38,6 +39,11 @@ db_config = {
 # Configuramos una clave en la aplicación para pasar la configuración de la BD a los blueprints
 app.config['DB_CONFIG'] = db_config
 
+# Context Processor para inyectar variables globales a las plantillas
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now} # Make datetime.now available as 'now'
+
 # Función para obtener una conexión a la base de datos (sin cambios)
 def get_db_connection():
     """Crea y retorna una conexión a la base de datos y un cursor."""
@@ -54,45 +60,84 @@ def get_db_connection():
 # Ruta principal (Index) - Modificada para probar la conexión a la BD (sin cambios recientes)
 @app.route('/')
 def index():
-    """Página principal, ahora también prueba la conexión a la BD."""
+    """Página principal con estadísticas y estado del sistema."""
     conn = None
     cursor = None
     db_status = "Desconectado"
     db_name = "N/A"
+    student_count = 0
+    teacher_count = 0
+    subject_count = 0
+    grade_count = 0
+    current_date = ""
 
     try:
+        # No longer need to import datetime here, it's global
+        current_date = datetime.now().strftime("%d/%m/%Y")
+        
         conn, cursor = get_db_connection()
         if conn and conn.is_connected() and cursor:
+            # Obtener el nombre de la base de datos
             cursor.execute("SELECT DATABASE();")
             result = cursor.fetchone()
             if result:
                 db_name = result['DATABASE()']
                 db_status = "Conectado"
-                # print(f"Conexión exitosa a la base de datos: {db_name}") # Ya no es necesario aquí
             else:
-                 db_status = "Conectado, pero no se pudo obtener el nombre de la BD."
+                db_status = "Conectado, pero no se pudo obtener el nombre de la BD."
+            
+            # Obtener conteo de estudiantes
+            cursor.execute("SELECT COUNT(*) as count FROM students")
+            result = cursor.fetchone()
+            student_count = result['count'] if result else 0
+            
+            # Obtener conteo de profesores
+            cursor.execute("SELECT COUNT(*) as count FROM teachers")
+            result = cursor.fetchone()
+            teacher_count = result['count'] if result else 0
+            
+            # Obtener conteo de asignaturas
+            cursor.execute("SELECT COUNT(*) as count FROM subjects")
+            result = cursor.fetchone()
+            subject_count = result['count'] if result else 0
+            
+            # Obtener conteo de grados
+            cursor.execute("SELECT COUNT(*) as count FROM grades")
+            result = cursor.fetchone()
+            grade_count = result['count'] if result else 0
         else:
-             # Este es el mensaje que probablemente ves en la web ahora
-             db_status = "Error al obtener conexión/cursor."
+            db_status = "Error al obtener conexión/cursor."
 
     except Error as e:
         db_status = f"Error de consulta: {e}"
-        # print(f"Error durante la consulta de prueba: {e}") # Ya no es necesario aquí
-
+    except Exception as e:
+        print(f"Error no esperado: {e}")
     finally:
         if cursor:
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
 
-    return render_template('index.html', title='Inicio', db_status=db_status, db_name=db_name)
+    return render_template('index.html', 
+                          title='Inicio', 
+                          db_status=db_status, 
+                          db_name=db_name,
+                          current_date=current_date,
+                          student_count=student_count,
+                          teacher_count=teacher_count,
+                          subject_count=subject_count,
+                          grade_count=grade_count)
 
 # Importar e registrar los blueprints
 from core.routes.student_routes import students_bp
 from core.routes.teacher_routes import teachers_bp
+from core.routes.subject_routes import subjects_bp
+from core.routes.grade_routes import grades_bp
 
 app.register_blueprint(students_bp, url_prefix='/students')
 app.register_blueprint(teachers_bp, url_prefix='/teachers')
+app.register_blueprint(subjects_bp, url_prefix='/subjects')
+app.register_blueprint(grades_bp, url_prefix='/grades')
 
 # Actualizar el enlace en index.html
 @app.route('/update_index')
